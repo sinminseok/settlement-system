@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group 'batch'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':settlement-system-core')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+}
+
+test {
+    useJUnitPlatform()
+}
