@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,5 +23,9 @@ public class Shop {
     private String name;
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> transactions;
+    private List<Transaction> transactions = new ArrayList<>();
+
+    public void addTransaction(Transaction transaction){
+        transactions.add(transaction);
+    }
 }

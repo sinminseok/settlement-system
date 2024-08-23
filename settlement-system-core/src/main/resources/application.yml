@@ -1,0 +1,33 @@
+spring:
+  datasource:
+
+    initialization-mode: always
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/settlement_system?serverTimezone=Asia/Seoul
+    username: root
+    password: sin981023@
+  sql:
+    init:
+      mode: always
+  #    data-locations: classpath:data.sql
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+#        id:
+#          new_generator_mappings: false
+
+  batch:
+    job:
+      enabled: true
+      name: dataCollectionAndPreprocessingJob
+    jdbc:
+      initialize-schema: always
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace

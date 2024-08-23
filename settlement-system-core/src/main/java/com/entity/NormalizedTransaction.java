@@ -9,26 +9,26 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
- * 일별 정산 내역
+ * 여러 가게에서 수집한 거래 정보를 정규화 하는 클래스
  */
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DailyTransactionHistory {
+public class NormalizedTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String shopName;
+
     private Long shopId;
 
-    private double revenue;
+    private double price;
 
-    // 정산 완료 시간
-    private LocalDateTime completionDateTime;
+    private TransactionStatus status;
+
 }
