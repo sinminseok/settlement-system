@@ -8,8 +8,9 @@ import java.time.LocalDateTime;
 
 public class ShopHelper {
 
-    public static Shop createShop(String shopName,LocalDateTime startDateTime,LocalDateTime cancelDateTime ,LocalDateTime completionDateTime){
+    public static Shop createShop(int shopId, String shopName,LocalDateTime startDateTime,LocalDateTime cancelDateTime ,LocalDateTime completionDateTime){
         Shop shop = Shop.builder()
+                .id(Long.valueOf(shopId))
                 .name(shopName)
                 .build();
 

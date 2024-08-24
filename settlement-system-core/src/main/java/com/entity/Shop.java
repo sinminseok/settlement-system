@@ -26,6 +26,10 @@ public class Shop {
     private List<Transaction> transactions = new ArrayList<>();
 
     public void addTransaction(Transaction transaction){
+        if (this.transactions == null) {
+            this.transactions = new ArrayList<>();
+        }
         transactions.add(transaction);
+        transaction.updateShop(this);
     }
 }

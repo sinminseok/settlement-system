@@ -38,4 +38,8 @@ public class Transaction  {
 
     //거래 종료 시간
     private LocalDateTime completionDateTime;
+
+    public void updateShop(Shop shop){
+        this.shop = shop;
+    }
 }

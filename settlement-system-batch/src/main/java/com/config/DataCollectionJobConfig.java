@@ -2,6 +2,7 @@ package com.config;
 
 import com.entity.NormalizedTransaction;
 import com.entity.Transaction;
+import com.entity.TransactionStatus;
 import com.parameters.DateParameter;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,9 @@ public class DataCollectionJobConfig {
     private static final String STEP_NAME = "dataCollectionStep";
 
     private final JobRepository jobRepository;
+
     private final PlatformTransactionManager platformTransactionManager;
+
     private final EntityManagerFactory entityManagerFactory;
 
     private final DateParameter jobParameter;
@@ -71,8 +74,6 @@ public class DataCollectionJobConfig {
         LocalDate requestDate = jobParameter.getRequestDate();
         String query = "SELECT t FROM Transaction t WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate";
 
-        System.out.println("requestDate");
-        System.out.println(requestDate);
         return new JpaPagingItemReaderBuilder<Transaction>()
                 .name("dataCollectionReader")
                 .entityManagerFactory(entityManagerFactory)
@@ -101,7 +102,7 @@ public class DataCollectionJobConfig {
     }
 
     private boolean validateTransaction(Transaction transaction) {
-        if (transaction.getCompletionDateTime() != null) {
+        if (transaction.getCompletionDateTime() != null && transaction.getStatus() == TransactionStatus.COMPLEMENT) {
             return true;
         }
         return false;
