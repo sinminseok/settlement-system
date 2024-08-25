@@ -39,6 +39,10 @@ public class Transaction  {
     //거래 종료 시간
     private LocalDateTime completionDateTime;
 
+    //적용된 할인 이벤트
+    @Enumerated(EnumType.STRING)
+    private DiscountType discountType;
+
     public void updateShop(Shop shop){
         this.shop = shop;
     }

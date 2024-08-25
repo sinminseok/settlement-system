@@ -88,6 +88,8 @@ public class DataCollectionJobConfig {
             if (!validateTransaction(transaction)) return null;
             return NormalizedTransaction.builder()
                     .price(transaction.getPrice())
+                    .discountType(transaction.getDiscountType())
+                    .completionDateTime(transaction.getCompletionDateTime())
                     .shopId(transaction.getShop().getId())
                     .status(transaction.getStatus())
                     .shopName(transaction.getShop().getName())

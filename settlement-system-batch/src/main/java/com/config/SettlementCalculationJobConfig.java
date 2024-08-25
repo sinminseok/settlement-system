@@ -1,5 +1,6 @@
 package com.config;
 
+import com.entity.DiscountType;
 import com.entity.NormalizedTransaction;
 import com.entity.Settlement;
 import com.parameters.DateParameter;
@@ -25,7 +26,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.util.Map;
 
 /**
- * 정산 계산 로직 Job
+ * 정
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -34,18 +35,25 @@ public class SettlementCalculationJobConfig {
 
     private static final String JOB_NAME = "settlementJob";
     private static final String STEP_NAME = "settlementStep";
+    private static final int CHARGE = 1000;
 
-    private Long currentShopId = 0L;
-    private Settlement currentSettlement;
     private final JobRepository jobRepository;
-    private final PlatformTransactionManager platformTransactionManager;
+    private final PlatformTransactionManager transactionManager;
     private final SettlementRepository settlementRepository;
     private final EntityManagerFactory entityManagerFactory;
     private final DateParameter jobParameter;
 
+    private Long currentShopId = 0L;
+    private Settlement currentSettlement;
+
+    @Bean("dataParameter")
+    @JobScope
+    public DateParameter dateParameter() {
+        return new DateParameter();
+    }
 
     @Bean
-    public Job settlementCalculation() {
+    public Job settlementCalculationJob() {
         return new JobBuilder(JOB_NAME, jobRepository)
                 .start(settlementCalculationStep())
                 .next(finalStep())
@@ -56,7 +64,7 @@ public class SettlementCalculationJobConfig {
     @JobScope
     public Step settlementCalculationStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<NormalizedTransaction, Settlement>chunk(100, platformTransactionManager)
+                .<NormalizedTransaction, Settlement>chunk(100, transactionManager)
                 .reader(settlementReader())
                 .processor(settlementItemProcessor())
                 .writer(settlementJpaItemWriter())
@@ -70,13 +78,16 @@ public class SettlementCalculationJobConfig {
                 .tasklet((contribution, chunkContext) -> {
                     settlementRepository.save(currentSettlement);
                     return RepeatStatus.FINISHED;
-                }, platformTransactionManager)
+                }, transactionManager)
                 .build();
     }
 
     @StepScope
+    @Bean
     public JpaPagingItemReader<NormalizedTransaction> settlementReader() {
-        String query = "SELECT t FROM NormalizedTransaction t WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate ORDER BY t.shopId ASC";
+        String query = "SELECT t FROM NormalizedTransaction t " +
+                "WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate " +
+                "ORDER BY t.shopId ASC";
         return new JpaPagingItemReaderBuilder<NormalizedTransaction>()
                 .name("settlementReader")
                 .entityManagerFactory(entityManagerFactory)
@@ -86,37 +97,59 @@ public class SettlementCalculationJobConfig {
                 .build();
     }
 
+    @Bean
     public ItemProcessor<NormalizedTransaction, Settlement> settlementItemProcessor() {
-        return normalizedTransaction -> {
-            if (currentShopId == normalizedTransaction.getShopId()) {
-                Settlement updateSettlement = createSettlementByTransaction(normalizedTransaction);
-                currentSettlement.updateSettlement(updateSettlement);
+        return transaction -> {
+            if (isSameShop(transaction)) {
+                currentSettlement.updateSettlement(createSettlement(transaction));
                 return null;
             } else {
                 Settlement previousSettlement = currentSettlement;
-                Settlement settlementByTransaction = createSettlementByTransaction(normalizedTransaction);
-                currentSettlement = settlementByTransaction;
-                currentShopId = normalizedTransaction.getShopId();
+                updateCurrentSettlement(transaction);
                 return previousSettlement;
             }
         };
     }
 
+    @Bean
     public JpaItemWriter<Settlement> settlementJpaItemWriter() {
         JpaItemWriter<Settlement> writer = new JpaItemWriter<>();
         writer.setEntityManagerFactory(entityManagerFactory);
         return writer;
-
     }
 
-    private Settlement createSettlementByTransaction(NormalizedTransaction normalizedTransaction) {
+    private boolean isSameShop(NormalizedTransaction transaction) {
+        return currentShopId.equals(transaction.getShopId());
+    }
+
+    private void updateCurrentSettlement(NormalizedTransaction transaction) {
+        currentSettlement = createSettlement(transaction);
+        currentShopId = transaction.getShopId();
+    }
+
+    private Settlement createSettlement(NormalizedTransaction transaction) {
+        double totalSales = 0.0;
+        double totalRefunds = 0.0;
+        double netSales = 0.0;
+
+        if (transaction.isRefundTransaction()) {
+            totalRefunds = transaction.getPrice();
+        } else {
+            totalSales = transaction.getPrice();
+            netSales = applyDiscount(transaction.getPrice(), transaction.getDiscountType());
+        }
+
         return Settlement.builder()
-                .shopId(normalizedTransaction.getShopId())
-                .shopName(normalizedTransaction.getShopName())
-                .totalSales(normalizedTransaction.getPrice())
-                .netSales(normalizedTransaction.getPrice() - 10) // 수수료 10 원
+                .shopId(transaction.getShopId())
+                .shopName(transaction.getShopName())
+                .totalSales(totalSales)
+                .settlementDateTime(transaction.getCompletionDateTime())
+                .totalRefunds(totalRefunds)
+                .netSales(netSales)
                 .build();
     }
 
-
+    private double applyDiscount(double originalPrice, DiscountType discountType) {
+        return discountType.applyDiscount(originalPrice) - CHARGE;
+    }
 }
