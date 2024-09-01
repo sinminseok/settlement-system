@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.entity.MonthlySettlement;
 import com.entity.Settlement;
 import com.service.SettlementService;
 import com.utils.CsvHelper;
@@ -22,9 +23,9 @@ public class SettlementController {
 
     private final SettlementService settlementService;
 
-    @GetMapping("/download/csv")
-    public void downloadSettlement(HttpServletResponse response, @RequestParam("shopId") Long shopId, @RequestParam("localDate") LocalDate localDate) throws IOException {
-        Settlement settlement = settlementService.findByIdAndDateTime(shopId, localDate);
+    @GetMapping("/daily/download/csv")
+    public void downloadDailySettlement(HttpServletResponse response, @RequestParam("shopId") Long shopId, @RequestParam("localDate") LocalDate localDate) throws IOException {
+        Settlement settlement = settlementService.findByIdAndDate(shopId, localDate);
 
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"settlements.csv\"");
@@ -32,5 +33,19 @@ public class SettlementController {
         try (Writer writer = response.getWriter()){
             CsvHelper.writeSettlementsToCsv(writer, settlement);
         }
+    }
+
+    @GetMapping("/monthly/download/csv")
+    public void downloadMonthlySettlement(HttpServletResponse response, @RequestParam("shopId") Long shopId, @RequestParam("localDate") LocalDate localDate) throws IOException {
+
+        response.setContentType("test/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"settlements.csv\"");
+
+        MonthlySettlement monthlySettlement = settlementService.findByIdAndMonth(shopId, localDate);
+
+        try (Writer writer = response.getWriter()){
+            CsvHelper.writeMonthlySettlementsToCsv(writer, monthlySettlement);
+        }
+
     }
 }
