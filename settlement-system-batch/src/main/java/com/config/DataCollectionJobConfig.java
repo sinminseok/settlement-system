@@ -20,6 +20,7 @@ import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.LocalDate;
@@ -45,6 +46,7 @@ public class DataCollectionJobConfig {
     private final DateParameter jobParameter;
 
     @Bean("dataParameter")
+    @Primary
     @JobScope
     public DateParameter dateParameter() {
         return new DateParameter();

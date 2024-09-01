@@ -19,8 +19,10 @@ import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Map;
@@ -46,23 +48,23 @@ public class SettlementCalculationJobConfig {
     private Long currentShopId = 0L;
     private Settlement currentSettlement;
 
-    @Bean("dataParameter")
+    @Bean("settlementCalculationParameter")
     @JobScope
-    public DateParameter dateParameter() {
+    public DateParameter settlementCalculationParameter() {
         return new DateParameter();
     }
 
     @Bean
-    public Job settlementCalculationJob() {
+    public Job settlementJob() {
         return new JobBuilder(JOB_NAME, jobRepository)
-                .start(settlementCalculationStep())
-                .next(finalStep())
+                .start(settlementStep())
+                .next(finalizeSettlementStep())
                 .build();
     }
 
     @Bean
     @JobScope
-    public Step settlementCalculationStep() {
+    public Step settlementStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
                 .<NormalizedTransaction, Settlement>chunk(100, transactionManager)
                 .reader(settlementReader())
@@ -73,8 +75,8 @@ public class SettlementCalculationJobConfig {
 
     @Bean
     @JobScope
-    public Step finalStep() {
-        return new StepBuilder("finalStep", jobRepository)
+    public Step finalizeSettlementStep() {
+        return new StepBuilder("finalizeSettlementStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     settlementRepository.save(currentSettlement);
                     return RepeatStatus.FINISHED;

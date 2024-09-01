@@ -66,7 +66,7 @@ public class DataCollectionJobTest {
         }
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("requestDate", "20240823")
+                .addString("requestDate", "2024-08-23T14:30:45.123")
                 .toJobParameters();
 
         //when

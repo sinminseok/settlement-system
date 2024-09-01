@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   datasource:
 
     initialization-mode: always
@@ -22,8 +24,8 @@ spring:
 
   batch:
     job:
-      enabled: true
-      name: dataCollectionAndPreprocessingJob
+      enabled: false
+#      name: dataCollectionJob
     jdbc:
       initialize-schema: always
 
