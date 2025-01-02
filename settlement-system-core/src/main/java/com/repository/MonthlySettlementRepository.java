@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface MonthlySettlementRepository extends JpaRepository<MonthlySettlement, Long> {
 
-    @Query("SELECT m FROM MonthlySettlement m WHERE m.shopId = :shopId AND FUNCTION('MONTH', m.settlementDateTime) = :month AND FUNCTION('YEAR', m.settlementDateTime) = :year")
+    @Query("SELECT m FROM MonthlySettlement m WHERE m.shopId = :shopId AND FUNCTION('MONTH', m.settlementDateTime) = FUNCTION('MONTH', :date) AND FUNCTION('YEAR', m.settlementDateTime) = FUNCTION('YEAR', :date)")
     Optional<MonthlySettlement> findByShopIdAndSettlementMonthly(@Param("shopId") Long shopId, @Param("date") LocalDate date);
+
 
 }

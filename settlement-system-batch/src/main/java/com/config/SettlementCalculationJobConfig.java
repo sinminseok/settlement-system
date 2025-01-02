@@ -19,16 +19,14 @@ import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Map;
 
 /**
- * 정
+ * 일별 정산 시스템
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -38,6 +36,7 @@ public class SettlementCalculationJobConfig {
     private static final String JOB_NAME = "settlementJob";
     private static final String STEP_NAME = "settlementStep";
     private static final int CHARGE = 1000;
+
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;

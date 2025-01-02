@@ -17,15 +17,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MonthlySettlement {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long shopId;
+
     private String shopName;
+
     private LocalDateTime settlementDateTime;
-    private double totalSales;      // 총 매출
-    private double totalRefunds;    // 총 환불 금액
-    private double netSales;        // 순 매출 (수수료 및 할인이 반영된 금액)
+
+    private double totalSales; // 총 매출
+
+    private double totalRefunds; // 총 환불 금액
+
+    private double netSales; // 순 매출 (수수료 및 할인이 반영된 금액)
 
     public void updateBySettlement(Settlement settlement) {
         this.totalSales += settlement.getTotalSales();

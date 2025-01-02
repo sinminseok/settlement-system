@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 여러 가게에서 수집한 거래 정보를 정규화 하는 클래스
+ * 데이터 전처리 후 정보를 나타낼 Entity
  */
 @Entity
 @Getter

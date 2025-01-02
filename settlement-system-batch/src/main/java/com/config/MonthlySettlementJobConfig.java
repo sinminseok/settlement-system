@@ -26,6 +26,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * 월별 정산 Job
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Configuration

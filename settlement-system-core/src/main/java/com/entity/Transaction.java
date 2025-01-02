@@ -9,6 +9,9 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
+/**
+ * 거래 내역 정보를 나타낼 Entity
+ */
 @Entity
 @Getter
 @Builder
@@ -22,13 +25,6 @@ public class Transaction  {
 
     private double price;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id")
-    private Shop shop;
-
     // 거래 시작 시간
     @CreatedDate
     private LocalDateTime startDateTime;
@@ -38,6 +34,13 @@ public class Transaction  {
 
     //거래 종료 시간
     private LocalDateTime completionDateTime;
+
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    private Shop shop;
 
     //적용된 할인 이벤트
     @Enumerated(EnumType.STRING)

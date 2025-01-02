@@ -18,7 +18,9 @@ public class DateParameter {
 
     @Value("#{jobParameters[requestDate]}")
     public void setRequestDate(String requestDateString) {
-        // `requestDateString`을 LocalDateTime으로 파싱한 후 LocalDate로 변환
+        /*
+         * `requestDateString`을 LocalDateTime 으로 파싱한 후 LocalDate 로 변환
+         */
         LocalDateTime localDateTime = LocalDateTime.parse(requestDateString, DateTimeFormatter.ISO_DATE_TIME);
         this.requestDate = localDateTime.toLocalDate();
     }

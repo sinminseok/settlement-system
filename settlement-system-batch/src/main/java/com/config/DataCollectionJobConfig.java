@@ -106,7 +106,7 @@ public class DataCollectionJobConfig {
     }
 
     private boolean validateTransaction(Transaction transaction) {
-        if (transaction.getCompletionDateTime() != null && transaction.getStatus() == TransactionStatus.COMPLEMENT) {
+        if (transaction.getCompletionDateTime() != null && transaction.getStatus() == TransactionStatus.COMPLEMENT && transaction.getPrice() >= 0) {
             return true;
         }
         return false;

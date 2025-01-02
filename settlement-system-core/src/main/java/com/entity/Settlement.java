@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * 일별 정산 내역을 나타낼 entity
+ */
 @Entity
 @Getter
 @Builder
