@@ -35,6 +35,7 @@ public class SettlementCalculationJobConfig {
 
     private static final String JOB_NAME = "settlementJob";
     private static final String STEP_NAME = "settlementStep";
+
     private static final int CHARGE = 1000;
 
 
