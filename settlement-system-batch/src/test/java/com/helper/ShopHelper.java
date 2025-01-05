@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 
 public class ShopHelper {
 
-    public static Shop createShop(int shopId, String shopName,LocalDateTime startDateTime,LocalDateTime cancelDateTime ,LocalDateTime completionDateTime){
+    public static Shop createShop(int shopId, String shopName,LocalDateTime startDateTime, LocalDateTime cancelDateTime ,LocalDateTime completionDateTime){
         Shop shop = Shop.builder()
                 .id(Long.valueOf(shopId))
                 .name(shopName)
                 .build();
 
-        for(int i=0; i< 10; i++) {
+        for(int i=0; i < 10; i++) {
             Transaction transaction = Transaction.builder()
                     .price(1000 + i*1000)
                     .status(TransactionStatus.COMPLEMENT)

@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,11 +30,10 @@ import static com.helper.ShopHelper.createShop;
 @SpringBatchTest
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes={DataCollectionJobConfig.class, TestBatchLegacyConfig.class})
+@SpringBootTest(classes = {DataCollectionJobConfig.class, TestBatchLegacyConfig.class})
 @EnableJpaRepositories(basePackages = "com.repository")
 @EntityScan(basePackages = "com.entity")
 public class DataCollectionJobTest {
-
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -57,12 +57,19 @@ public class DataCollectionJobTest {
     void 데이터_전처리_통합_테스트() throws Exception {
         //given
         int shopSize = 10;
-        LocalDateTime startDateTime = LocalDateTime.of(2024,8,23,21,45);
-        LocalDateTime completionDateTime = LocalDateTime.of(2024,8,23,22,45);
+        LocalDateTime startDateTime = LocalDateTime.of(2024, 8, 23, 21, 45);
+        LocalDateTime completionDateTime = LocalDateTime.of(2024, 8, 23, 22, 45);
 
-        for(int i=1; i<shopSize; i++) {
-            Shop shop = createShop(i,"SHOP" + i, startDateTime, null, completionDateTime);
+        for (int i = 0; i <= shopSize; i++) {
+            Shop shop = createShop(i, "SHOP" + i, startDateTime, null, completionDateTime);
             shopRepository.save(shop);
+            shopRepository.flush();
+        }
+
+        for (int i = shopSize * 2; i < shopSize * 3; i++) {
+            Shop shop = createShop(i, "NULL COMPLATEDATETIME SHOP" + i, startDateTime, null, null);
+            shopRepository.save(shop);
+            shopRepository.flush();
         }
 
         JobParameters jobParameters = new JobParametersBuilder()
@@ -74,6 +81,6 @@ public class DataCollectionJobTest {
 
         //then
         List<NormalizedTransaction> all = normalizedTransactionRepository.findAll();
-        Assertions.assertThat(all.size()).isEqualTo(90);
+        Assertions.assertThat(all.size()).isEqualTo(100);
     }
 }

@@ -20,7 +20,6 @@ import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -63,7 +62,7 @@ public class SettlementCalculationJobTest {
     void 가게별_통계_기능_통합_테스트() throws Exception {
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2024,10,23,13,13);
-        for(int i=1; i<10; i++){
+        for(int i=1; i<11; i++){
             List<NormalizedTransaction> normalizedTransactions = createNormalizedTransactions(Long.valueOf(i), "SHOPNAME" + i, localDateTime);
             normalizedTransactions.stream()
                     .forEach(normalizedTransaction -> {
@@ -72,17 +71,42 @@ public class SettlementCalculationJobTest {
         }
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("requestDate", "20241023")
+                .addString("requestDate", "2024-10-23T14:30:45.123")
                 .toJobParameters();
 
         //when
-
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
 
         //then
         List<Settlement> all = settlementRepository.findAll();
 
-        Assertions.assertThat(all.size()).isEqualTo(9);
+        Assertions.assertThat(all.size()).isEqualTo(10);
         Assertions.assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+    }
+
+    @Test
+    void 할인_적용_테스트() throws Exception {
+        //VIP_DISCOUNT == 10퍼센트 할인
+        //수수료(1개의 거래당) 1000원 할인
+        //given
+        LocalDateTime localDateTime = LocalDateTime.of(2024,10,23,13,13);
+
+        List<NormalizedTransaction> normalizedTransactions = createNormalizedTransactions(1L, "SHOPNAME", localDateTime);
+        normalizedTransactions.stream()
+                .forEach(normalizedTransaction -> normalizedTransactionRepository.save(normalizedTransaction));
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("requestDate", "2024-10-23T14:30:45.123")
+                .toJobParameters();
+
+        //when
+        jobLauncherTestUtils.launchJob(jobParameters);
+
+        //then
+        List<Settlement> all = settlementRepository.findAll();
+
+        Settlement settlement = all.get(0);
+        Assertions.assertThat(settlement.getTotalSales()).isEqualTo(100000);
+        Assertions.assertThat(settlement.getNetSales()).isEqualTo(80000);
     }
 }

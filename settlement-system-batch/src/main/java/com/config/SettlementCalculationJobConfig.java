@@ -35,9 +35,7 @@ public class SettlementCalculationJobConfig {
 
     private static final String JOB_NAME = "settlementJob";
     private static final String STEP_NAME = "settlementStep";
-
-    private static final int CHARGE = 1000;
-
+    private static final int FEE = 1000;
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
@@ -48,7 +46,7 @@ public class SettlementCalculationJobConfig {
     private Long currentShopId = 0L;
     private Settlement currentSettlement;
 
-    @Bean("settlementCalculationParameter")
+    @Bean(JOB_NAME + "jobParameter")
     @JobScope
     public DateParameter settlementCalculationParameter() {
         return new DateParameter();
@@ -78,6 +76,9 @@ public class SettlementCalculationJobConfig {
     public Step finalizeSettlementStep() {
         return new StepBuilder("finalizeSettlementStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
+                    if(currentSettlement == null){
+                        return RepeatStatus.FINISHED;
+                    }
                     settlementRepository.save(currentSettlement);
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
@@ -152,6 +153,6 @@ public class SettlementCalculationJobConfig {
     }
 
     private double applyDiscount(double originalPrice, DiscountType discountType) {
-        return discountType.applyDiscount(originalPrice) - CHARGE;
+        return discountType.applyDiscount(originalPrice) - FEE;
     }
 }
