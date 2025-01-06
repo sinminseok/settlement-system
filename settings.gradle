@@ -2,4 +2,5 @@ rootProject.name = 'settlement-system'
 include 'settlement-system-api'
 include 'settlement-system-core'
 include 'settlement-system-batch'
+include 'settlement-system-cms'
 
