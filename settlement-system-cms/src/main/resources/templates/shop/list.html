@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>가게별 정산 정보</title>
+    <!-- 외부 CSS 파일을 링크 -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+
+<!-- 상단 제목을 가운데로 배치 -->
+<h1 class="center-title">가게별 정산 정보</h1>
+
+<!-- 테이블을 감싸는 div 추가 -->
+<div class="table-container">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- shops 리스트를 순회하며 각 항목을 출력 -->
+        <tr th:each="shop : ${shops}">
+            <td th:text="${shop.id}"></td>
+            <td th:text="${shop.name}"></td>
+            <td><a th:href="@{/shops/{id}(id=${shop.id})}" class="view-link">View</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

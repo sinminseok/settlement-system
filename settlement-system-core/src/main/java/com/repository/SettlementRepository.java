@@ -15,4 +15,6 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
     @Query("SELECT s FROM Settlement s WHERE s.shopId = :shopId AND FUNCTION('DATE', s.settlementDateTime) = :date")
     Optional<Settlement> findByShopIdAndSettlementDate(@Param("shopId") Long shopId, @Param("date") LocalDate date);
 
+    @Query("SELECT s FROM Settlement s WHERE s.shopId = :shopId AND FUNCTION('DATE', s.settlementDateTime) = :date")
+    Optional<Settlement> findOneByShopIdAndSettlementDate(@Param("shopId") Long shopId, @Param("date") LocalDate date);
 }

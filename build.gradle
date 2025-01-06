@@ -74,6 +74,12 @@ project(':settlement-system-api') {
 	}
 }
 
+project(':settlement-system-cms') {
+	dependencies {
+		implementation project(':settlement-system-core')
+	}
+}
+
 
 project(':settlement-system-batch') {
 	dependencies {
