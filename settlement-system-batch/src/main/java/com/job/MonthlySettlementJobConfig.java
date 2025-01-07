@@ -1,4 +1,4 @@
-package com.config;
+package com.job;
 
 import com.entity.MonthlySettlement;
 import com.entity.Settlement;
