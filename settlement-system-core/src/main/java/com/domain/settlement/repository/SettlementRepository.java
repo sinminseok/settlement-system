@@ -1,6 +1,6 @@
-package com.repository;
+package com.domain.settlement.repository;
 
-import com.entity.Settlement;
+import com.domain.settlement.entity.Settlement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

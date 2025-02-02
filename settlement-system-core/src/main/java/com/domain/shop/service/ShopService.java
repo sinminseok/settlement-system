@@ -1,8 +1,8 @@
-package com.service;
+package com.domain.shop.service;
 
-import com.dto.ShopResponse;
-import com.entity.Shop;
-import com.repository.ShopRepository;
+import com.domain.shop.dto.ShopResponse;
+import com.domain.shop.entity.Shop;
+import com.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

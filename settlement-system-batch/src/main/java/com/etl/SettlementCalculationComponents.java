@@ -1,16 +1,15 @@
 package com.etl;
 
-import com.entity.DiscountType;
-import com.entity.NormalizedTransaction;
-import com.entity.Settlement;
+import com.domain.order.constants.DiscountType;
+import com.domain.order.entity.OrderTransaction;
+import com.domain.settlement.entity.Settlement;
 import com.parameters.DateParameter;
-import com.repository.SettlementRepository;
+import com.domain.settlement.repository.SettlementRepository;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
@@ -21,11 +20,11 @@ public class SettlementCalculationComponents {
     private static Settlement currentSettlement;
     private static final int FEE = 1000;
 
-    public static JpaPagingItemReader<NormalizedTransaction> settlementReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
-        String query = "SELECT t FROM NormalizedTransaction t " +
+    public static JpaPagingItemReader<OrderTransaction> settlementReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
+        String query = "SELECT t FROM OrderTransaction t " +
                 "WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate " +
                 "ORDER BY t.shopId ASC";
-        return new JpaPagingItemReaderBuilder<NormalizedTransaction>()
+        return new JpaPagingItemReaderBuilder<OrderTransaction>()
                 .name("settlementReader")
                 .entityManagerFactory(entityManagerFactory)
                 .pageSize(100)
@@ -34,7 +33,7 @@ public class SettlementCalculationComponents {
                 .build();
     }
 
-    public static ItemProcessor<NormalizedTransaction, Settlement> settlementItemProcessor() {
+    public static ItemProcessor<OrderTransaction, Settlement> settlementItemProcessor() {
         return transaction -> {
             if (isSameShop(transaction)) {
                 currentSettlement.updateSettlement(createSettlement(transaction));
@@ -61,16 +60,16 @@ public class SettlementCalculationComponents {
         return writer;
     }
 
-    private static boolean isSameShop(NormalizedTransaction transaction) {
+    private static boolean isSameShop(OrderTransaction transaction) {
         return currentShopId.equals(transaction.getShopId());
     }
 
-    private static void updateCurrentSettlement(NormalizedTransaction transaction) {
+    private static void updateCurrentSettlement(OrderTransaction transaction) {
         currentSettlement = createSettlement(transaction);
         currentShopId = transaction.getShopId();
     }
 
-    private static Settlement createSettlement(NormalizedTransaction transaction) {
+    private static Settlement createSettlement(OrderTransaction transaction) {
         double totalSales = 0.0;
         double totalRefunds = 0.0;
         double netSales = 0.0;

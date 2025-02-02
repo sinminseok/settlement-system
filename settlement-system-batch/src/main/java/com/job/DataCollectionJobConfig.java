@@ -1,7 +1,7 @@
 package com.job;
 
-import com.entity.NormalizedTransaction;
-import com.entity.Transaction;
+import com.domain.order.entity.OrderTransaction;
+import com.domain.order.entity.Order;
 import com.etl.DataCollectionComponents;
 import com.parameters.DateParameter;
 import jakarta.persistence.EntityManagerFactory;
@@ -56,11 +56,11 @@ public class DataCollectionJobConfig {
     @Bean
     @JobScope
     public Step dataCollectionStep() {
-        JpaPagingItemReader<Transaction> reader = DataCollectionComponents.dataCollectionReader(entityManagerFactory, jobParameter);
-        ItemProcessor<Transaction, NormalizedTransaction> processor = DataCollectionComponents.dataCollectionProcessor();
-        JpaItemWriter<NormalizedTransaction> writer = DataCollectionComponents.dataCollectionWriter(entityManagerFactory);
+        JpaPagingItemReader<Order> reader = DataCollectionComponents.dataCollectionReader(entityManagerFactory, jobParameter);
+        ItemProcessor<Order, OrderTransaction> processor = DataCollectionComponents.dataCollectionProcessor();
+        JpaItemWriter<OrderTransaction> writer = DataCollectionComponents.dataCollectionWriter(entityManagerFactory);
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<Transaction, NormalizedTransaction>chunk(100, platformTransactionManager)
+                .<Order, OrderTransaction>chunk(100, platformTransactionManager)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)

@@ -1,8 +1,8 @@
 package com.controller;
 
-import com.entity.MonthlySettlement;
-import com.entity.Settlement;
-import com.service.SettlementService;
+import com.domain.settlement.entity.MonthlySettlement;
+import com.domain.settlement.entity.Settlement;
+import com.domain.settlement.service.SettlementService;
 import com.utils.CsvHelper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

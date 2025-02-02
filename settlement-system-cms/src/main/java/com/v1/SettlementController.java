@@ -1,4 +1,4 @@
-package com.controller;
+package com.v1;
 
 public class SettlementController {
 }

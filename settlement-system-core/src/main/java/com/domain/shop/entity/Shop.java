@@ -1,5 +1,6 @@
-package com.entity;
+package com.domain.shop.entity;
 
+import com.domain.order.entity.Order;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,13 +24,13 @@ public class Shop {
     private String name;
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> transactions = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 
-    public void addTransaction(Transaction transaction){
-        if (this.transactions == null) {
-            this.transactions = new ArrayList<>();
+    public void addTransaction(Order transaction){
+        if (this.orders == null) {
+            this.orders = new ArrayList<>();
         }
-        transactions.add(transaction);
+        orders.add(transaction);
         transaction.updateShop(this);
     }
 }

@@ -1,5 +1,7 @@
-package com.entity;
+package com.domain.order.entity;
 
+import com.domain.order.constants.DiscountType;
+import com.domain.order.constants.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NormalizedTransaction {
+public class OrderTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,13 +33,13 @@ public class NormalizedTransaction {
     private LocalDateTime completionDateTime; //거래 종료 시간
 
     @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
+    private OrderStatus status;
 
     @Enumerated(EnumType.STRING)
     private DiscountType discountType;
 
     public boolean isRefundTransaction(){
-        if(status.equals(TransactionStatus.CANCEL)){
+        if(status.equals(OrderStatus.CANCEL)){
             return true;
         }
         return false;

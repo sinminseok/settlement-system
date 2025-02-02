@@ -1,5 +1,8 @@
-package com.entity;
+package com.domain.order.entity;
 
+import com.domain.order.constants.DiscountType;
+import com.domain.shop.entity.Shop;
+import com.domain.order.constants.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Transaction  {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +39,7 @@ public class Transaction  {
     private LocalDateTime completionDateTime;
 
     @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
+    private OrderStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")

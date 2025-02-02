@@ -1,4 +1,4 @@
-package com.dto;
+package com.domain.settlement.dto;
 
 import lombok.Builder;
 import lombok.Getter;

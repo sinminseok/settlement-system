@@ -1,7 +1,7 @@
-package com.controller;
+package com.v1;
 
-import com.dto.ShopResponse;
-import com.service.ShopService;
+import com.domain.shop.dto.ShopResponse;
+import com.domain.shop.service.ShopService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

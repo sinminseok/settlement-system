@@ -1,9 +1,9 @@
 package com.job;
 
-import com.entity.MonthlySettlement;
-import com.entity.Settlement;
+import com.domain.settlement.entity.MonthlySettlement;
+import com.domain.settlement.entity.Settlement;
 import com.parameters.DateParameter;
-import com.repository.MonthlySettlementRepository;
+import com.domain.settlement.repository.MonthlySettlementRepository;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

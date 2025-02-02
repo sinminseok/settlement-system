@@ -1,10 +1,9 @@
 package com.etl;
 
-import com.entity.NormalizedTransaction;
-import com.entity.Transaction;
-import com.entity.TransactionStatus;
+import com.domain.order.entity.OrderTransaction;
+import com.domain.order.entity.Order;
+import com.domain.order.constants.OrderStatus;
 import com.parameters.DateParameter;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
@@ -16,11 +15,11 @@ import java.util.Map;
 
 public class DataCollectionComponents {
 
-    public static JpaPagingItemReader<Transaction> dataCollectionReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
+    public static JpaPagingItemReader<Order> dataCollectionReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
         LocalDate requestDate = dateParameter.getRequestDate();
-        String query = "SELECT t FROM Transaction t WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate";
+        String query = "SELECT t FROM Order t WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate";
 
-        return new JpaPagingItemReaderBuilder<Transaction>()
+        return new JpaPagingItemReaderBuilder<Order>()
                 .name("dataCollectionReader")
                 .entityManagerFactory(entityManagerFactory)
                 .pageSize(100)
@@ -29,29 +28,29 @@ public class DataCollectionComponents {
                 .build();
     }
 
-    public static ItemProcessor<Transaction, NormalizedTransaction> dataCollectionProcessor() {
+    public static ItemProcessor<Order, OrderTransaction> dataCollectionProcessor() {
         return transaction -> {
             if (!validateTransaction(transaction)) return null;
             return toNormalizedTransaction(transaction);
         };
     }
 
-    public static JpaItemWriter<NormalizedTransaction> dataCollectionWriter(EntityManagerFactory entityManagerFactory) {
-        JpaItemWriter<NormalizedTransaction> writer = new JpaItemWriter<>();
+    public static JpaItemWriter<OrderTransaction> dataCollectionWriter(EntityManagerFactory entityManagerFactory) {
+        JpaItemWriter<OrderTransaction> writer = new JpaItemWriter<>();
         writer.setEntityManagerFactory(entityManagerFactory);
         return writer;
     }
 
-    private static boolean validateTransaction(Transaction transaction) {
+    private static boolean validateTransaction(Order transaction) {
         //날짜 데이터 누락, 거래 상태, 거래 금액 양수 확인
-        if (transaction.getCompletionDateTime() != null && transaction.getStatus() == TransactionStatus.COMPLEMENT && transaction.getPrice() >= 0) {
+        if (transaction.getCompletionDateTime() != null && transaction.getStatus() == OrderStatus.COMPLEMENT && transaction.getPrice() >= 0) {
             return true;
         }
         return false;
     }
 
-    private static NormalizedTransaction toNormalizedTransaction(Transaction transaction){
-        return NormalizedTransaction.builder()
+    private static OrderTransaction toNormalizedTransaction(Order transaction){
+        return OrderTransaction.builder()
                 .price(transaction.getPrice())
                 .discountType(transaction.getDiscountType())
                 .completionDateTime(transaction.getCompletionDateTime())

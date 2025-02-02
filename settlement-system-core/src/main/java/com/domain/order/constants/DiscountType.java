@@ -1,4 +1,4 @@
-package com.entity;
+package com.domain.order.constants;
 
 public enum DiscountType {
     FIRST_ORDER_DISCOUNT(5),

@@ -1,9 +1,9 @@
 package com.job;
 
-import com.entity.NormalizedTransaction;
-import com.entity.Shop;
-import com.repository.NormalizedTransactionRepository;
-import com.repository.ShopRepository;
+import com.domain.order.entity.OrderTransaction;
+import com.domain.shop.entity.Shop;
+import com.domain.settlement.repository.NormalizedTransactionRepository;
+import com.domain.shop.repository.ShopRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +79,7 @@ public class DataCollectionJobTest {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
 
         //then
-        List<NormalizedTransaction> all = normalizedTransactionRepository.findAll();
+        List<OrderTransaction> all = normalizedTransactionRepository.findAll();
         Assertions.assertThat(all.size()).isEqualTo(100);
     }
 }

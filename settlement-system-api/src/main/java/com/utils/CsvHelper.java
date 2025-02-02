@@ -1,7 +1,7 @@
 package com.utils;
 
-import com.entity.MonthlySettlement;
-import com.entity.Settlement;
+import com.domain.settlement.entity.MonthlySettlement;
+import com.domain.settlement.entity.Settlement;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 

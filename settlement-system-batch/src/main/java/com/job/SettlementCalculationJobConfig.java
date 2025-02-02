@@ -1,10 +1,10 @@
 package com.job;
 
-import com.entity.NormalizedTransaction;
-import com.entity.Settlement;
+import com.domain.order.entity.OrderTransaction;
+import com.domain.settlement.entity.Settlement;
 import com.etl.SettlementCalculationComponents;
 import com.parameters.DateParameter;
-import com.repository.SettlementRepository;
+import com.domain.settlement.repository.SettlementRepository;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,11 +57,11 @@ public class SettlementCalculationJobConfig {
     @Bean
     @JobScope
     public Step settlementStep() {
-        JpaPagingItemReader<NormalizedTransaction> reader = SettlementCalculationComponents.settlementReader(entityManagerFactory, jobParameter);
-        ItemProcessor<NormalizedTransaction, Settlement> processor = SettlementCalculationComponents.settlementItemProcessor();
+        JpaPagingItemReader<OrderTransaction> reader = SettlementCalculationComponents.settlementReader(entityManagerFactory, jobParameter);
+        ItemProcessor<OrderTransaction, Settlement> processor = SettlementCalculationComponents.settlementItemProcessor();
         JpaItemWriter<Settlement> writer = SettlementCalculationComponents.settlementJpaItemWriter(entityManagerFactory);
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<NormalizedTransaction, Settlement>chunk(100, transactionManager)
+                .<OrderTransaction, Settlement>chunk(100, transactionManager)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)

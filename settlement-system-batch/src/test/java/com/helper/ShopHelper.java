@@ -1,8 +1,8 @@
 package com.helper;
 
-import com.entity.Shop;
-import com.entity.Transaction;
-import com.entity.TransactionStatus;
+import com.domain.order.entity.Order;
+import com.domain.shop.entity.Shop;
+import com.domain.order.constants.OrderStatus;
 
 import java.time.LocalDateTime;
 
@@ -15,9 +15,9 @@ public class ShopHelper {
                 .build();
 
         for(int i=0; i < 10; i++) {
-            Transaction transaction = Transaction.builder()
+            Order transaction = Order.builder()
                     .price(1000 + i*1000)
-                    .status(TransactionStatus.COMPLEMENT)
+                    .status(OrderStatus.COMPLEMENT)
                     .startDateTime(startDateTime)
                     .cancelDateTime(cancelDateTime)
                     .completionDateTime(completionDateTime)

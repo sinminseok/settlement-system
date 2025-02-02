@@ -1,8 +1,8 @@
 package com.helper;
 
-import com.entity.DiscountType;
-import com.entity.NormalizedTransaction;
-import com.entity.TransactionStatus;
+import com.domain.order.constants.DiscountType;
+import com.domain.order.entity.OrderTransaction;
+import com.domain.order.constants.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,17 +10,17 @@ import java.util.List;
 
 public class NormalizedTransactionHelper {
 
-    public static List<NormalizedTransaction> createNormalizedTransactions(Long shopId, String shopName, LocalDateTime completionDateTime){
-        List<NormalizedTransaction> response = new ArrayList<>();
+    public static List<OrderTransaction> createNormalizedTransactions(Long shopId, String shopName, LocalDateTime completionDateTime){
+        List<OrderTransaction> response = new ArrayList<>();
 
         for(int i=0; i<10; i++) {
-            response.add(NormalizedTransaction.builder()
+            response.add(OrderTransaction.builder()
                     .shopName(shopName)
                     .shopId(shopId)
                     .price(10000)
                     .discountType(DiscountType.VIP_DISCOUNT)
                     .completionDateTime(completionDateTime)
-                    .status(TransactionStatus.COMPLEMENT)
+                    .status(OrderStatus.COMPLEMENT)
                     .build());
         }
 

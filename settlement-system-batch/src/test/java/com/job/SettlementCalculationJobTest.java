@@ -1,11 +1,11 @@
 package com.job;
 
 
-import com.entity.NormalizedTransaction;
-import com.entity.Settlement;
-import com.repository.NormalizedTransactionRepository;
-import com.repository.SettlementRepository;
-import com.repository.ShopRepository;
+import com.domain.order.entity.OrderTransaction;
+import com.domain.settlement.entity.Settlement;
+import com.domain.settlement.repository.NormalizedTransactionRepository;
+import com.domain.settlement.repository.SettlementRepository;
+import com.domain.shop.repository.ShopRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +63,7 @@ public class SettlementCalculationJobTest {
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2024,10,23,13,13);
         for(int i=1; i<11; i++){
-            List<NormalizedTransaction> normalizedTransactions = createNormalizedTransactions(Long.valueOf(i), "SHOPNAME" + i, localDateTime);
+            List<OrderTransaction> normalizedTransactions = createNormalizedTransactions(Long.valueOf(i), "SHOPNAME" + i, localDateTime);
             normalizedTransactions.stream()
                     .forEach(normalizedTransaction -> {
                         normalizedTransactionRepository.save(normalizedTransaction);
@@ -91,7 +91,7 @@ public class SettlementCalculationJobTest {
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2024,10,23,13,13);
 
-        List<NormalizedTransaction> normalizedTransactions = createNormalizedTransactions(1L, "SHOPNAME", localDateTime);
+        List<OrderTransaction> normalizedTransactions = createNormalizedTransactions(1L, "SHOPNAME", localDateTime);
         normalizedTransactions.stream()
                 .forEach(normalizedTransaction -> normalizedTransactionRepository.save(normalizedTransaction));
 
