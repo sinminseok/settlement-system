@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: settlement-system
   config:
     import: "optional:file:.env[.properties]"  # .env 파일 직접 로드
 
@@ -30,6 +32,11 @@ spring:
       enabled: false
     jdbc:
       initialize-schema: always
+jwt:
+  secret-key: ${SECRET_KEY}
+  access-key-expiration-s: ${ACCESS_KEY_EXPIRATION_SECONDS}
+  refresh-key-expiration-s: ${REFRESH_KEY_EXPIRATION_SECONDS}
+
 
 logging:
   level:
