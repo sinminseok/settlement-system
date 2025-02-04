@@ -1,5 +1,5 @@
 package com.domain.user.entity;
 
-public enum RoleEnum {
+public enum Role {
     ADMIN, OWNER;
 }

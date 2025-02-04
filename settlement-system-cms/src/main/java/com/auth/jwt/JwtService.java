@@ -4,7 +4,7 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
-import com.domain.user.entity.RoleEnum;
+import com.domain.user.entity.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class JwtService {
 
     public AccessTokenPayload createAccessTokenPayload(Claims payload) {
         String roleString = payload.get("role", String.class);
-        RoleEnum roleEnum = RoleEnum.valueOf(roleString);
+        Role roleEnum = Role.valueOf(roleString);
 
         return new AccessTokenPayload(
                 payload.getSubject(),

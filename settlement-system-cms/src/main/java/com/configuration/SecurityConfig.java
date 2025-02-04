@@ -3,7 +3,7 @@ package com.configuration;
 
 import com.auth.RequestMatcherHolder;
 import com.auth.jwt.JwtAuthenticationFilter;
-import com.domain.user.entity.RoleEnum;
+import com.domain.user.entity.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,10 +40,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req ->
                         req
-                                .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(RoleEnum.ADMIN))
-                                .hasAnyAuthority(RoleEnum.ADMIN.name())
-                                .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(RoleEnum.OWNER))
-                                .hasAnyAuthority(RoleEnum.OWNER.name(), RoleEnum.ADMIN.name())
+                                .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(null))
+                                .permitAll()
+                                .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(Role.ADMIN))
+                                .hasAnyAuthority(Role.ADMIN.name())
+                                .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(Role.OWNER))
+                                .hasAnyAuthority(Role.OWNER.name(), Role.ADMIN.name())
                                 .anyRequest().authenticated()
                 );
 

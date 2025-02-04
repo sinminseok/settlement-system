@@ -11,6 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -37,7 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         try {
             final String accessToken = getAccessTokenFromCookie(request);
             Claims claims = jwtService.verifyToken(accessToken);
@@ -63,7 +65,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         for (Cookie cookie : cookies) {
+            log.info("Cookie Name: {}, Value: {}", cookie.getName(), cookie.getValue()); // ✅ 쿠키 값 로깅
             if (cookie.getName().equals(JwtMetadata.ACCESS_TOKEN)) {
+                if (cookie.getValue() == null || cookie.getValue().isEmpty()) {
+                    throw new JwtException("Empty Token in Cookie");
+                }
                 return cookie.getValue();
             }
         }
@@ -72,6 +78,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return requestMatcherHolder.getRequestMatchersByMinRole(null).matches(request);
+        // `Role == null`일 때 요청에 대해 필터를 건너뛰도록 설정
+        RequestMatcher requestMatchers = requestMatcherHolder.getRequestMatchersByMinRole(null);
+        return requestMatchers.matches(request);
     }
 }

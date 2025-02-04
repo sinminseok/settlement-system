@@ -1,4 +1,4 @@
-package com.v1;
+package com.v1.shop;
 
 import com.domain.shop.dto.ShopResponse;
 import com.domain.shop.service.ShopService;

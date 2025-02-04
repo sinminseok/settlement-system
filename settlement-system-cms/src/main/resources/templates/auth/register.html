@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+<h2>회원가입</h2>
+<form id="signup-form">
+    <label for="email">이메일:</label>
+    <input type="email" id="email" name="email" required>
+    <br>
+    <label for="password">비밀번호:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <label for="role">역할:</label>
+    <select id="role" name="role" required>
+        <option value="ADMIN">관리자</option>
+        <option value="OWNER">소유자</option>
+    </select>
+    <br>
+    <button type="submit">가입하기</button>
+</form>
+<a href="/auth/login">로그인하기</a>
+
+<script>
+  document.getElementById('signup-form').addEventListener('submit', function(event) {
+    event.preventDefault();  // 폼의 기본 제출을 막음
+
+    const formData = new FormData(this);
+    const data = {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      role: formData.get('role')  // Role 값을 가져와서 전송
+    };
+
+    fetch('/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'  // JSON 형식으로 데이터 전송
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+      console.log('회원가입 성공:', result);
+      // 회원가입 성공 후 처리 로직 (예: 로그인 페이지로 리다이렉트)
+      window.location.href = '/auth/login';
+    })
+    .catch(error => {
+      console.error('회원가입 실패:', error);
+    });
+  });
+</script>
+</body>
+</html>

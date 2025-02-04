@@ -1,6 +1,7 @@
 spring:
   application:
     name: settlement-system
+
   config:
     import: "optional:file:.env[.properties]"  # .env 파일 직접 로드
 
@@ -18,7 +19,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       database-platform: org.hibernate.dialect.MySQLDialect
       defer-datasource-initialization: true
     properties:
