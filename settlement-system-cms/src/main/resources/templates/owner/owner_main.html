@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매출 관리</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <!-- 오늘의 매출 -->
+    <div class="today-sales">
+        <h2>오늘의 매출</h2>
+        <p>총 매출: <span id="total-sales">0</span> 원</p>
+        <p>주문 건수: <span id="order-count">0</span> 건</p>
+        <p>평균 주문 금액: <span id="avg-sales">0</span> 원</p>
+    </div>
+
+    <!-- 달력 -->
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button id="prev-month">◀</button>
+            <h3 id="current-month">2024년 2월</h3>
+            <button id="next-month">▶</button>
+        </div>
+        <div class="calendar-grid">
+            <!-- 날짜 생성됨 -->
+        </div>
+    </div>
+
+    <!-- 주문 내역 -->
+    <div class="order-list">
+        <h2>주문 내역</h2>
+        <ul id="order-list">
+            <!-- 주문 데이터 추가됨 -->
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

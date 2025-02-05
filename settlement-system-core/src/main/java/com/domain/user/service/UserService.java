@@ -1,6 +1,7 @@
 package com.domain.user.service;
 
 import com.domain.user.dto.UserRegisterRequest;
+import com.domain.user.entity.Role;
 import com.domain.user.entity.User;
 import com.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,4 +22,6 @@ public class UserService {
                 .build();
         userRepository.save(user);
     }
+
+
 }

@@ -21,16 +21,17 @@ import jakarta.annotation.Nullable;
 public class RequestMatcherHolder {
 
     private static final List<RequestInfo> REQUEST_INFO_LIST = List.of(
+            new RequestInfo(GET, "/css/*", null),
             //회원가입, 로그인
-            new RequestInfo(GET, "/auth/login", null),
-            new RequestInfo(GET, "/users/register", null),
-            new RequestInfo(POST, "/users", null),
-            new RequestInfo(GET, "/login", null),
-            new RequestInfo(POST, "/auth/login", null),
+            new RequestInfo(GET, "/auth/*", null),
+            new RequestInfo(POST, "/auth/*", null),
+            new RequestInfo(GET, "/users/*", null),
             // admin (관리자)
-            new RequestInfo(POST, "/admin/register", null),
+            new RequestInfo(POST, "/admin/*", Role.ADMIN),
+            new RequestInfo(GET, "/admin/*", Role.ADMIN),
             // owner (가게 사장)
-            new RequestInfo(POST, "/owner/register", null)
+            new RequestInfo(POST, "/owner/*", Role.OWNER),
+            new RequestInfo(GET, "/owner/*", Role.OWNER)
     );
 
     private final ConcurrentHashMap<String, RequestMatcher> reqMatcherCacheMap = new ConcurrentHashMap<>();

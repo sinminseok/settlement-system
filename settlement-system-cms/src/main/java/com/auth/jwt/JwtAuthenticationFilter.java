@@ -63,9 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (cookies == null) {
             throw new JwtException("Missing cookie");
         }
-
         for (Cookie cookie : cookies) {
-            log.info("Cookie Name: {}, Value: {}", cookie.getName(), cookie.getValue()); // ✅ 쿠키 값 로깅
             if (cookie.getName().equals(JwtMetadata.ACCESS_TOKEN)) {
                 if (cookie.getValue() == null || cookie.getValue().isEmpty()) {
                     throw new JwtException("Empty Token in Cookie");
@@ -78,7 +76,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        // `Role == null`일 때 요청에 대해 필터를 건너뛰도록 설정
         RequestMatcher requestMatchers = requestMatcherHolder.getRequestMatchersByMinRole(null);
         return requestMatchers.matches(request);
     }

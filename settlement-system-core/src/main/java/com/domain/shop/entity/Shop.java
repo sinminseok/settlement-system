@@ -3,25 +3,28 @@ package com.domain.shop.entity;
 import com.domain.order.entity.Order;
 import com.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "shop")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class Shop {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @UuidGenerator
+    @Column(name = "shop_id", nullable = false, updatable = false)
+    private UUID id;
 
+    @Setter
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)

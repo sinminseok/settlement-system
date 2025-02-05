@@ -19,8 +19,6 @@ public class JwtFilterExceptionResolver implements FilterExceptionResolver<JwtEx
     public void setResponse(HttpServletResponse response, JwtException ex) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        //only load general error stack to hide info
         response.getWriter()
                 .write(new ObjectMapper().writeValueAsString(
                         new ErrorResponse(HttpStatus.UNAUTHORIZED.name(), ex.getMessage())));

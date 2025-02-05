@@ -45,7 +45,7 @@ public class SecurityConfig {
                                 .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(Role.ADMIN))
                                 .hasAnyAuthority(Role.ADMIN.name())
                                 .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(Role.OWNER))
-                                .hasAnyAuthority(Role.OWNER.name(), Role.ADMIN.name())
+                                .hasAnyAuthority(Role.OWNER.name())
                                 .anyRequest().authenticated()
                 );
 

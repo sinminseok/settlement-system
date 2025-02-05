@@ -1,5 +1,6 @@
 package com.auth;
 
+import com.domain.user.entity.Role;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
