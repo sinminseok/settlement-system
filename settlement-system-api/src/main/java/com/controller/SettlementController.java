@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.Writer;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class SettlementController {
     private final SettlementService settlementService;
 
     @GetMapping("/daily/download/csv")
-    public void downloadDailySettlement(HttpServletResponse response, @RequestParam("shopId") Long shopId, @RequestParam("localDate") LocalDate localDate) throws IOException {
+    public void downloadDailySettlement(HttpServletResponse response, @RequestParam("shopId") UUID shopId, @RequestParam("localDate") LocalDate localDate) throws IOException {
         Settlement settlement = settlementService.findByIdAndDate(shopId, localDate);
 
         response.setContentType("text/csv");
@@ -36,7 +37,7 @@ public class SettlementController {
     }
 
     @GetMapping("/monthly/download/csv")
-    public void downloadMonthlySettlement(HttpServletResponse response, @RequestParam("shopId") Long shopId, @RequestParam("localDate") LocalDate localDate) throws IOException {
+    public void downloadMonthlySettlement(HttpServletResponse response, @RequestParam("shopId") UUID shopId, @RequestParam("localDate") LocalDate localDate) throws IOException {
 
         response.setContentType("test/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"settlements.csv\"");

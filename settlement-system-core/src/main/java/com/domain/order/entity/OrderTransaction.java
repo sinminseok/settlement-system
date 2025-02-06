@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 데이터 전처리 후 정보를 나타낼 Entity
@@ -21,12 +23,13 @@ import java.time.LocalDateTime;
 public class OrderTransaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @UuidGenerator
+    @Column(name = "order_transaction_id", nullable = false, updatable = false)
+    private UUID id;
 
     private String shopName;
 
-    private Long shopId;
+    private UUID shopId;
 
     private double price;
 

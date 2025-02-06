@@ -8,12 +8,13 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface MonthlySettlementRepository extends JpaRepository<MonthlySettlement, Long> {
+public interface MonthlySettlementRepository extends JpaRepository<MonthlySettlement, UUID> {
 
     @Query("SELECT m FROM MonthlySettlement m WHERE m.shopId = :shopId AND FUNCTION('MONTH', m.settlementDateTime) = FUNCTION('MONTH', :date) AND FUNCTION('YEAR', m.settlementDateTime) = FUNCTION('YEAR', :date)")
-    Optional<MonthlySettlement> findByShopIdAndSettlementMonthly(@Param("shopId") Long shopId, @Param("date") LocalDate date);
+    Optional<MonthlySettlement> findByShopIdAndSettlementMonthly(@Param("shopId") UUID shopId, @Param("date") LocalDate date);
 
 
 }

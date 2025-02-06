@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -16,11 +18,12 @@ import java.time.LocalDateTime;
 public class MonthlySettlement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @UuidGenerator
+    @Column(name = "monthly_settlement_id", nullable = false, updatable = false)
+    private UUID id;
 
     @Column(name = "shop_id", nullable = false)
-    private Long shopId;
+    private UUID shopId;
 
     @Column(name = "shop_name", nullable = false)
     private String shopName;

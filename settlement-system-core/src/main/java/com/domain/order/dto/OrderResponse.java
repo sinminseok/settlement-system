@@ -10,13 +10,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderResponse {
-    private Long id;
+    private UUID id;
 
     private double price;
 

@@ -2,8 +2,10 @@ package com.domain.order.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -14,8 +16,9 @@ import java.time.LocalDateTime;
 public class OrderPayment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @UuidGenerator
+    @Column(name = "order_payment_id", nullable = false, updatable = false)
+    private UUID id;
 
     @Setter
     @OneToOne

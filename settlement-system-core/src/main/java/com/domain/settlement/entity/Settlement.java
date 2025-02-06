@@ -2,9 +2,11 @@ package com.domain.settlement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 일별 정산 내역을 나타낼 entity
@@ -17,12 +19,12 @@ import java.time.LocalDateTime;
 public class Settlement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @UuidGenerator
     @Column(name = "settlement_id", nullable = false, updatable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "shop_id", nullable = false)
-    private Long shopId;
+    private UUID shopId;
 
     @Column(name = "shop_name", nullable = false)
     private String shopName;
