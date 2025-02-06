@@ -2,7 +2,10 @@ package com.auth;
 
 import java.io.IOException;
 
+import com.exception.AuthException;
 import com.exception.ErrorResponse;
+import com.exception.ErrorResponseCode;
+import com.exception.ExceptionResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -21,7 +24,7 @@ public class JwtFilterExceptionResolver implements FilterExceptionResolver<JwtEx
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter()
                 .write(new ObjectMapper().writeValueAsString(
-                        new ErrorResponse(HttpStatus.UNAUTHORIZED.name(), ex.getMessage())));
+                        new AuthException(ErrorResponseCode.NOT_VALID_TOKEN, ex.getMessage())));
 
     }
 }

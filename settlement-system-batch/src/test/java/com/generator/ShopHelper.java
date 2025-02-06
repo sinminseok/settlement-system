@@ -1,4 +1,4 @@
-package com.helper;
+package com.generator;
 
 import com.domain.order.entity.Order;
 import com.domain.shop.entity.Shop;

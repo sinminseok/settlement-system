@@ -12,10 +12,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "shop")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Shop {
 
     @Id

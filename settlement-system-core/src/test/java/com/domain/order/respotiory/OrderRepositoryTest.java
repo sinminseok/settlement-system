@@ -1,0 +1,49 @@
+package com.domain.order.respotiory;
+
+import com.config.TestConfig;
+import com.domain.order.entity.Order;
+import com.domain.order.repository.OrderRepository;
+import com.domain.shop.entity.Shop;
+import com.domain.shop.repository.ShopRepository;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import java.util.List;
+
+import static com.generator.OrderGenerator.generateOrder;
+import static com.generator.ShopGenerator.generateShop;
+
+@DataJpaTest
+@Import(TestConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+public class OrderRepositoryTest {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private ShopRepository shopRepository;
+
+    @Test
+    void 주문_페이징_조회(){
+        //given
+        Shop shop = shopRepository.save(generateShop(null));
+
+        for(int i=0; i<20; i++){
+            orderRepository.save(generateOrder(shop));
+        }
+        //when
+        Pageable pageable = PageRequest.of(1, 10, Sort.by(Sort.Direction.DESC, "startDateTime"));
+        List<Order> byShopIdAndPage = orderRepository.findByShopIdAndPage(shop.getId(), pageable);
+
+        //then
+        Assertions.assertThat(byShopIdAndPage.size()).isEqualTo(10);
+    }
+}

@@ -24,7 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.helper.ShopHelper.createShop;
+import static com.generator.ShopHelper.createShop;
 
 @SpringBatchTest
 @ActiveProfiles("test")

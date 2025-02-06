@@ -4,10 +4,7 @@ import com.domain.order.constants.DiscountType;
 import com.domain.shop.entity.Shop;
 import com.domain.order.constants.OrderStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -50,9 +47,11 @@ public class Order {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    //적용된 할인 이벤트
     @Enumerated(EnumType.STRING)
     private DiscountType discountType;
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private OrderPayment orderPayment;
 
     public void updateShop(Shop shop){
         this.shop = shop;

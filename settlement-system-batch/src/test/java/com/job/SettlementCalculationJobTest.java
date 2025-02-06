@@ -27,7 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.helper.NormalizedTransactionHelper.createNormalizedTransactions;
+import static com.generator.NormalizedTransactionHelper.createNormalizedTransactions;
 
 @SpringBatchTest
 @ActiveProfiles("test")

@@ -9,6 +9,9 @@ import com.domain.user.entity.RefreshToken;
 import com.domain.user.entity.User;
 import com.domain.user.repository.RefreshTokenRepository;
 import com.domain.user.repository.UserRepository;
+import com.exception.EmailExistException;
+import com.exception.ErrorResponseCode;
+import com.exception.PasswordMatchException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -56,11 +59,10 @@ public class LoginService {
     private User getValidatedUser(String email, String password){
         User user = userRepository.findByEmail(email).orElse(null);
         if(user == null){
-            //todo 커스텀 예외로 변경
-            throw new IllegalArgumentException("존재하지 않는 이메일 입니다.");
+            throw new EmailExistException(ErrorResponseCode.NOT_FOUND, "존재하지 않는 이메일 입니다.");
         }
         if(!passwordEncoder.matches(password, user.getPassword())){
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new PasswordMatchException(ErrorResponseCode.NOT_MATCH_PASSWORD, "비밀번호가 일치하지 않습니다.");
         }
         return user;
     }

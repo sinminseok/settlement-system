@@ -1,4 +1,4 @@
-package com.helper;
+package com.generator;
 
 import com.domain.order.constants.DiscountType;
 import com.domain.order.entity.OrderTransaction;

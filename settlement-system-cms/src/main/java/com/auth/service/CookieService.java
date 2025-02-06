@@ -2,7 +2,7 @@ package com.auth.service;
 
 import java.time.Duration;
 
-import com.auth.constants.JwtMetadata;
+import com.auth.dto.JwtMetadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;

@@ -4,38 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>매출 관리</title>
-    <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="/js/script.js"></script>
 </head>
 <body>
 
-<div class="main">
-    <!-- 오늘의 매출 -->
-    <div class="today-sales">
-        <h2>오늘의 매출</h2>
-        <p>총 매출: <span id="total-sales">0</span> 원</p>
-        <p>주문 건수: <span id="order-count">0</span> 건</p>
-        <p>평균 주문 금액: <span id="avg-sales">0</span> 원</p>
-    </div>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar p-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <button class="nav-link active btn w-100" id="settlement-btn">정산 정보</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link btn w-100" id="orders-btn">주문 조회</button>
+                </li>
+            </ul>
+        </nav>
 
-    <!-- 달력 -->
-    <div class="calendar-container">
-        <div class="calendar-header">
-            <button id="prev-month">◀</button>
-            <h3 id="current-month">2024년 2월</h3>
-            <button id="next-month">▶</button>
-        </div>
-        <div class="calendar-grid">
-            <!-- 날짜 생성됨 -->
-        </div>
-    </div>
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div id="settlement-section" class="section py-4">
+                <h2 class="mb-4">정산 정보</h2>
+                <div class="card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button id="prev-month" class="btn btn-outline-primary">&lt;</button>
+                        <span id="current-month" class="fs-5">2025년 2월</span>
+                        <button id="next-month" class="btn btn-outline-primary">&gt;</button>
+                    </div>
+                    <div class="calendar-grid mt-3">
+                        <!-- 달력 날짜별 매출 정보 동적 생성 -->
+                    </div>
+                </div>
+            </div>
 
-    <!-- 주문 내역 -->
-    <div class="order-list">
-        <h2>주문 내역</h2>
-        <ul id="order-list">
-            <!-- 주문 데이터 추가됨 -->
-        </ul>
+            <div id="orders-section" class="section py-4 d-none">
+                <h2 class="mb-4">주문 조회</h2>
+                <div class="card p-3">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>주문번호</th>
+                            <th>고객명</th>
+                            <th>총 금액</th>
+                            <th>주문 날짜</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td th:text="${order.id}"></td>
+                            <td th:text="${order.customerName}"></td>
+                            <td th:text="${order.totalPrice}"></td>
+                            <td th:text="${order.orderDate}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
 </div>
 

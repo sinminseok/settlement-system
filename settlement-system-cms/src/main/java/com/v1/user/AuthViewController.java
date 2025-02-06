@@ -17,17 +17,17 @@ public class AuthViewController {
     private final SecurityContextHelper securityContextHelper;
     private final UserService userService;
 
-    @GetMapping("/login")
+    @RequestMapping("/login")
     public String loginPage() {
         return "auth/login"; // login.html 반환
     }
 
-    @GetMapping("/register")
+    @RequestMapping("/register")
     public String registerPage() {
         return "auth/register";
     }
 
-    @GetMapping("/user-login")
+    @RequestMapping("/user-login")
     public String login(){
         return "owner/owner_main";
     }

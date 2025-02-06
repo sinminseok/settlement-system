@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "user")
+@Table(name = "`user`")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 public class User extends BaseTimeEntity {

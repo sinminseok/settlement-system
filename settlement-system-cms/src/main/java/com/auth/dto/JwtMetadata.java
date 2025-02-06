@@ -1,4 +1,4 @@
-package com.auth.constants;
+package com.auth.dto;
 
 
 public class JwtMetadata {

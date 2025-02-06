@@ -22,16 +22,18 @@ public class RequestMatcherHolder {
 
     private static final List<RequestInfo> REQUEST_INFO_LIST = List.of(
             new RequestInfo(GET, "/css/*", null),
+            new RequestInfo(GET, "/js/*", null),
             //회원가입, 로그인
             new RequestInfo(GET, "/auth/*", null),
             new RequestInfo(POST, "/auth/*", null),
             new RequestInfo(GET, "/users/*", null),
+            new RequestInfo(POST, "/users", null),
             // admin (관리자)
-            new RequestInfo(POST, "/admin/*", Role.ADMIN),
-            new RequestInfo(GET, "/admin/*", Role.ADMIN),
+            new RequestInfo(POST, "/admins/*", Role.ADMIN),
+            new RequestInfo(GET, "/admins/*", Role.ADMIN),
             // owner (가게 사장)
-            new RequestInfo(POST, "/owner/*", Role.OWNER),
-            new RequestInfo(GET, "/owner/*", Role.OWNER)
+            new RequestInfo(POST, "/owners/*", Role.OWNER),
+            new RequestInfo(GET, "/owners/*", Role.OWNER)
     );
 
     private final ConcurrentHashMap<String, RequestMatcher> reqMatcherCacheMap = new ConcurrentHashMap<>();
