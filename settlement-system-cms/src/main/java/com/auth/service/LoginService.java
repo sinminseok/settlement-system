@@ -1,7 +1,7 @@
 package com.auth.service;
 
 import com.auth.dto.LoginCommandDto;
-import com.auth.dto.LoginResultDto;
+import com.auth.dto.LoginResponse;
 import com.auth.jwt.AccessTokenPayload;
 import com.auth.jwt.JwtService;
 import com.auth.jwt.RefreshTokenPayload;
@@ -32,28 +32,20 @@ public class LoginService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final CookieService cookieService;
 
-    @Value("#{${jwt.access-key-expiration-s} * 1000}")
-    private long accessKeyExpirationInMs;
-
-    @Value("#{${jwt.refresh-key-expiration-s} * 1000}")
-    private long refreshKeyExpirationInMs;
-
     @Transactional
-    public LoginResultDto login(LoginCommandDto command){
+    public LoginResponse login(LoginCommandDto command){
         User user = getValidatedUser(command.getEmail(), command.getPassword());
         refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
         RefreshToken saved = refreshTokenRepository.save(RefreshToken.builder()
                         .user(user)
-                        .expiredAt(LocalDateTime.now().plus(Duration.ofMillis(refreshKeyExpirationInMs)))
                 .build());
 
         AccessTokenPayload accessTokenPayload = new AccessTokenPayload(user.getEmail(), user.getRole(), new Date());
         String accessToken = jwtService.createAccessToken(accessTokenPayload);
         String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(saved.getId().toString(), new Date()));
-
-        ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken, Duration.ofMillis(accessKeyExpirationInMs));
-
-        return new LoginResultDto(accessTokenCookie, refreshToken, user);
+        ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
+        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(refreshToken);
+        return new LoginResponse(user.getRole(), accessTokenCookie, refreshTokenCookie);
     }
 
     private User getValidatedUser(String email, String password){

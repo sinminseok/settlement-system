@@ -7,12 +7,14 @@ spring:
 
   main:
     allow-bean-definition-overriding: true
+
   datasource:
-    initialization-mode: never
+    initialization-mode: update
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
   sql:
     init:
       mode: always

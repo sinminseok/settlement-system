@@ -7,10 +7,11 @@ import com.domain.order.constants.OrderStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class NormalizedTransactionHelper {
 
-    public static List<OrderTransaction> createNormalizedTransactions(Long shopId, String shopName, LocalDateTime completionDateTime){
+    public static List<OrderTransaction> createNormalizedTransactions(UUID shopId, String shopName, LocalDateTime completionDateTime){
         List<OrderTransaction> response = new ArrayList<>();
 
         for(int i=0; i<10; i++) {

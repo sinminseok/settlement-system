@@ -43,7 +43,6 @@ public class JwtService {
     public AccessTokenPayload createAccessTokenPayload(Claims payload) {
         String roleString = payload.get("role", String.class);
         Role roleEnum = Role.valueOf(roleString);
-
         return new AccessTokenPayload(
                 payload.getSubject(),
                 roleEnum,

@@ -1,5 +1,6 @@
 package com.domain.shop.entity;
 
+import com.domain.common.BaseTimeEntity;
 import com.domain.order.entity.Order;
 import com.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Shop {
+public class Shop extends BaseTimeEntity {
 
     @Id
     @UuidGenerator
@@ -29,12 +30,16 @@ public class Shop {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
+
+    public UUID getShopUserId(){
+        return user.getId();
+    }
 
     public void addTransaction(Order transaction){
         if (this.orders == null) {

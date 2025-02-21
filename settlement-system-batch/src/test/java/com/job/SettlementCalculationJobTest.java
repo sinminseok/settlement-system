@@ -1,6 +1,6 @@
 package com.job;
 
-
+import com.config.QueryDslConfig;
 import com.domain.order.entity.OrderTransaction;
 import com.domain.settlement.entity.Settlement;
 import com.domain.settlement.repository.NormalizedTransactionRepository;
@@ -18,23 +18,20 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static com.generator.NormalizedTransactionHelper.createNormalizedTransactions;
 
 @SpringBatchTest
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes={SettlementCalculationJobConfig.class, TestBatchLegacyConfig.class})
-@EnableJpaRepositories(basePackages = "com.repository")
-@EntityScan(basePackages = "com.entity")
+@SpringBootTest(classes={SettlementCalculationJobConfig.class, TestBatchLegacyConfig.class, QueryDslConfig.class})
 public class SettlementCalculationJobTest {
 
     @Autowired
@@ -62,8 +59,8 @@ public class SettlementCalculationJobTest {
     void 가게별_통계_기능_통합_테스트() throws Exception {
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2024,10,23,13,13);
-        for(int i=1; i<11; i++){
-            List<OrderTransaction> normalizedTransactions = createNormalizedTransactions(Long.valueOf(i), "SHOPNAME" + i, localDateTime);
+        for(int i=0; i<10; i++){
+            List<OrderTransaction> normalizedTransactions = createNormalizedTransactions(UUID.randomUUID(), "SHOPNAME" + i, localDateTime);
             normalizedTransactions.stream()
                     .forEach(normalizedTransaction -> {
                         normalizedTransactionRepository.save(normalizedTransaction);
@@ -91,7 +88,7 @@ public class SettlementCalculationJobTest {
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2024,10,23,13,13);
 
-        List<OrderTransaction> normalizedTransactions = createNormalizedTransactions(1L, "SHOPNAME", localDateTime);
+        List<OrderTransaction> normalizedTransactions = createNormalizedTransactions(UUID.randomUUID(), "SHOPNAME", localDateTime);
         normalizedTransactions.stream()
                 .forEach(normalizedTransaction -> normalizedTransactionRepository.save(normalizedTransaction));
 

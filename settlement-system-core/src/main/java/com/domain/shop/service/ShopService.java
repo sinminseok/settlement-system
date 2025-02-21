@@ -4,9 +4,14 @@ import com.domain.shop.dto.ShopResponse;
 import com.domain.shop.entity.Shop;
 import com.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -15,17 +20,26 @@ public class ShopService {
 
     private final ShopRepository shopRepository;
 
-    public List<ShopResponse> findAll(){
+    public UUID getShopIdByEmail(String email){
+        return shopRepository.findByUserEmail(email).getId();
+    }
+
+    public List<ShopResponse> getAll(){
         return shopRepository.findAll()
                 .stream()
-                .map(shop -> toResponse(shop))
+                .map(ShopResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private ShopResponse toResponse(Shop shop){
-        return ShopResponse.builder()
-                .id(shop.getId())
-                .name(shop.getName())
-                .build();
+    public List<ShopResponse> getShopByPage(int page, int size){
+        Pageable pageable = PageRequest.of(page, size); // 정렬 기준 추가
+        Page<Shop> all = shopRepository.findAll(pageable);
+        return all.stream().map(ShopResponse::from).toList();
     }
+
+    public List<ShopResponse> getByEmailOrName(final String email, String shopName){
+        List<Shop> byEmailOrOwnerName = shopRepository.findByEmailOrOwnerName(email, shopName);
+        return byEmailOrOwnerName.stream().map(ShopResponse::from).toList();
+    }
+
 }

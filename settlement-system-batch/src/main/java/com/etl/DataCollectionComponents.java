@@ -42,7 +42,6 @@ public class DataCollectionComponents {
     }
 
     private static boolean validateTransaction(Order transaction) {
-        //날짜 데이터 누락, 거래 상태, 거래 금액 양수 확인
         if (transaction.getCompletionDateTime() != null && transaction.getStatus() == OrderStatus.COMPLEMENT && transaction.getPrice() >= 0) {
             return true;
         }

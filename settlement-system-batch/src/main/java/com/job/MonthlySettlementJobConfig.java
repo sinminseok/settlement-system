@@ -25,6 +25,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 월별 정산 Job
@@ -43,7 +44,7 @@ public class MonthlySettlementJobConfig {
     private final DateParameter jobParameter;
     private final MonthlySettlementRepository monthlySettlementRepository;
 
-    private Long currentShopId = 0L;
+    private UUID currentShopId = UUID.randomUUID();
     private MonthlySettlement currentSettlement;
 
     @Bean("monthlySettlementParameter")

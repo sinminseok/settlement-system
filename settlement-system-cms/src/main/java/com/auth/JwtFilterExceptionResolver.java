@@ -3,11 +3,8 @@ package com.auth;
 import java.io.IOException;
 
 import com.exception.AuthException;
-import com.exception.ErrorResponse;
 import com.exception.ErrorResponseCode;
-import com.exception.ExceptionResolver;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import com.v1.response.SuccessResponse;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,11 +17,10 @@ public class JwtFilterExceptionResolver implements FilterExceptionResolver<JwtEx
 
     @Override
     public void setResponse(HttpServletResponse response, JwtException ex) throws IOException {
+        AuthException exception = new AuthException(ErrorResponseCode.NOT_VALID_TOKEN, "InValid Jwt Token");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter()
-                .write(new ObjectMapper().writeValueAsString(
-                        new AuthException(ErrorResponseCode.NOT_VALID_TOKEN, ex.getMessage())));
+        response.setContentType("application/json");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(new SuccessResponse(false, exception.getErrorMessage(), exception.getErrorCode().getCode())));
 
     }
 }

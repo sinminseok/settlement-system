@@ -1,6 +1,5 @@
 package com.etl;
 
-import com.domain.order.constants.DiscountType;
 import com.domain.order.entity.OrderTransaction;
 import com.domain.settlement.entity.Settlement;
 import com.parameters.DateParameter;
@@ -13,17 +12,17 @@ import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilde
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class SettlementCalculationComponents {
 
-    private static Long currentShopId = 0L;
+    private static UUID currentShopId = UUID.randomUUID();
     private static Settlement currentSettlement;
-    private static final int FEE = 1000;
 
     public static JpaPagingItemReader<OrderTransaction> settlementReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
         String query = "SELECT t FROM OrderTransaction t " +
                 "WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate " +
-                "ORDER BY t.shopId ASC";
+                "ORDER BY t.shopId ASC"; // ShopId 로 정렬
         return new JpaPagingItemReaderBuilder<OrderTransaction>()
                 .name("settlementReader")
                 .entityManagerFactory(entityManagerFactory)
@@ -36,9 +35,10 @@ public class SettlementCalculationComponents {
     public static ItemProcessor<OrderTransaction, Settlement> settlementItemProcessor() {
         return transaction -> {
             if (isSameShop(transaction)) {
-                currentSettlement.updateSettlement(createSettlement(transaction));
+                currentSettlement.updateSettlement(transaction.toInitSettlement());
                 return null;
             } else {
+                // 즉, 서로 다른 Shop 이 조회되는 순간 Chunk 에 Settlement 를 쌓는다.
                 Settlement previousSettlement = currentSettlement;
                 updateCurrentSettlement(transaction);
                 return previousSettlement;
@@ -46,7 +46,6 @@ public class SettlementCalculationComponents {
         };
     }
 
-    // 새로운 메서드 추가: finalizing settlement step
     @Transactional
     public static void finalizeSettlement(SettlementRepository settlementRepository) {
         if (currentSettlement != null) {
@@ -65,33 +64,8 @@ public class SettlementCalculationComponents {
     }
 
     private static void updateCurrentSettlement(OrderTransaction transaction) {
-        currentSettlement = createSettlement(transaction);
+        currentSettlement = transaction.toInitSettlement();
         currentShopId = transaction.getShopId();
     }
 
-    private static Settlement createSettlement(OrderTransaction transaction) {
-        double totalSales = 0.0;
-        double totalRefunds = 0.0;
-        double netSales = 0.0;
-
-        if (transaction.isRefundTransaction()) {
-            totalRefunds = transaction.getPrice();
-        } else {
-            totalSales = transaction.getPrice();
-            netSales = applyDiscount(transaction.getPrice(), transaction.getDiscountType());
-        }
-
-        return Settlement.builder()
-                .shopId(transaction.getShopId())
-                .shopName(transaction.getShopName())
-                .totalSales(totalSales)
-                .settlementDateTime(transaction.getCompletionDateTime())
-                .totalRefunds(totalRefunds)
-                .netSales(netSales)
-                .build();
-    }
-
-    private static double applyDiscount(double originalPrice, DiscountType discountType) {
-        return discountType.applyDiscount(originalPrice) - FEE;
-    }
 }

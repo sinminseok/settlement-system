@@ -20,7 +20,7 @@ public class RefreshToken {
     @Id
     @UuidGenerator
     @Column(name = "refresh_token_id", nullable = false, updatable = false)
-    private UUID id;
+    private String id;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,15 +32,10 @@ public class RefreshToken {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Setter
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "expired_at", nullable = false)
-    private LocalDateTime expiredAt;
 
     @Builder
-    public RefreshToken(User user, LocalDateTime expiredAt) {
+    public RefreshToken(User user) {
         this.user = user;
         this.createdAt = LocalDateTime.now();
-        this.expiredAt = expiredAt;
     }
 }

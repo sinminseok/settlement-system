@@ -6,66 +6,109 @@
     <title>매출 관리</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script defer src="/js/script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("/owners/shopId")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.cookie = `shopId=${data.data}; path=/; max-age=86400`;
+                    } else {
+                        alert("가게 ID를 불러오는 데 실패했습니다.");
+                    }
+                })
+                .catch(error => console.error("Error fetching shopId:", error));
+        });
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(";").shift();
+            return null;
+        }
+
+        function fetchOrders(page = 0, size = 10) {
+            const shopId = getCookie("shopId");
+            if (!shopId) {
+                alert("가게 ID를 찾을 수 없습니다. 다시 시도해주세요.");
+                return;
+            }
+
+            fetch(`/owners/orders?shopId=${shopId}&page=${page}&size=${size}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const ordersTableBody = document.getElementById("orders-table-body");
+                        ordersTableBody.innerHTML = "";
+                        data.data.forEach(order => {
+                            ordersTableBody.innerHTML += `
+                                <tr>
+                                    <td>${order.id}</td>
+                                    <td>₩${order.price.toLocaleString()}</td>
+                                    <td>${order.status}</td>
+                                    <td>${new Date(order.startDateTime).toLocaleString()}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        alert("주문 정보를 불러오는 데 실패했습니다.");
+                    }
+                })
+                .catch(error => console.error("Error fetching orders:", error));
+        }
+
+        function toggleView(mode) {
+            const calendarSection = document.getElementById("calendar-section");
+            const ordersSection = document.getElementById("orders-section");
+
+            if (mode === "settlement") {
+                calendarSection.classList.remove("d-none");
+                ordersSection.classList.add("d-none");
+            } else if (mode === "orders") {
+                calendarSection.classList.add("d-none");
+                ordersSection.classList.remove("d-none");
+                fetchOrders(); // 주문 목록 표시 시 데이터 가져오기
+            }
+        }
+    </script>
 </head>
 <body>
+<div class="container mt-5">
+    <h2 class="mb-4">📊 매출 관리 시스템</h2>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar p-3">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <button class="nav-link active btn w-100" id="settlement-btn">정산 정보</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link btn w-100" id="orders-btn">주문 조회</button>
-                </li>
+    <button class="btn btn-primary me-2" onclick="toggleView('settlement')">📊 정산 정보</button>
+    <button class="btn btn-success" onclick="toggleView('orders')">📥 주문 목록</button>
+
+    <!-- 정산 정보 (달력) -->
+    <div id="calendar-section" class="mt-4 d-none text-center">
+        <h3>📅 정산 기간 선택</h3>
+        <input type="date" class="form-control w-25 mx-auto">
+    </div>
+
+    <!-- 주문 목록 -->
+    <div id="orders-section" class="mt-4 d-none">
+        <h3>🛒 주문 목록</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>주문 ID</th>
+                <th>총 금액</th>
+                <th>상태</th>
+                <th>주문 날짜</th>
+            </tr>
+            </thead>
+            <tbody id="orders-table-body"></tbody>
+        </table>
+
+        <!-- 페이징 UI -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="#" onclick="fetchOrders(0)">1</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="fetchOrders(1)">2</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="fetchOrders(2)">3</a></li>
             </ul>
         </nav>
-
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div id="settlement-section" class="section py-4">
-                <h2 class="mb-4">정산 정보</h2>
-                <div class="card p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <button id="prev-month" class="btn btn-outline-primary">&lt;</button>
-                        <span id="current-month" class="fs-5">2025년 2월</span>
-                        <button id="next-month" class="btn btn-outline-primary">&gt;</button>
-                    </div>
-                    <div class="calendar-grid mt-3">
-                        <!-- 달력 날짜별 매출 정보 동적 생성 -->
-                    </div>
-                </div>
-            </div>
-
-            <div id="orders-section" class="section py-4 d-none">
-                <h2 class="mb-4">주문 조회</h2>
-                <div class="card p-3">
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th>주문번호</th>
-                            <th>고객명</th>
-                            <th>총 금액</th>
-                            <th>주문 날짜</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="order : ${orders}">
-                            <td th:text="${order.id}"></td>
-                            <td th:text="${order.customerName}"></td>
-                            <td th:text="${order.totalPrice}"></td>
-                            <td th:text="${order.orderDate}"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
     </div>
 </div>
-
 </body>
 </html>

@@ -1,4 +1,4 @@
-package com.configuration;
+package com.config;
 
 
 import com.auth.RequestMatcherHolder;
@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RequestMatcherHolder requestMatcherHolder;
+    private final CorsConfig corsConfig;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -32,24 +33,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        http.csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .addFilterAfter(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
+        http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))  // CORS 설정 추가
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(req ->
-                        req
-                                .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(null))
-                                .permitAll()
-                                .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(Role.ADMIN))
-                                .hasAnyAuthority(Role.ADMIN.name())
-                                .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(Role.OWNER))
-                                .hasAnyAuthority(Role.OWNER.name())
-                                .anyRequest().authenticated()
-                );
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(null)).permitAll()
+                        .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(Role.ADMIN)).hasAuthority(Role.ADMIN.name())
+                        .requestMatchers(requestMatcherHolder.getRequestMatchersByMinRole(Role.OWNER)).hasAuthority(Role.OWNER.name())
+                        .anyRequest().authenticated()
+                )
+                .addFilterAfter(jwtAuthenticationFilter, BasicAuthenticationFilter.class);
 
         return http.build();
-
     }
+
 }

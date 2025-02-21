@@ -16,6 +16,8 @@ import java.util.UUID;
 @Table(name = "settlement")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@Builder
+@AllArgsConstructor
 public class Settlement {
 
     @Id
@@ -30,7 +32,7 @@ public class Settlement {
     private String shopName;
 
     @Column(name = "settlement_date_time", nullable = false)
-    private LocalDateTime settlementDateTime;
+    private LocalDateTime settlementDateTime; // 정산 날짜
 
     @Column(name = "total_sales", nullable = true)
     private double totalSales;      // 총 매출
@@ -40,6 +42,9 @@ public class Settlement {
 
     @Column(name = "net_sales", nullable = true)
     private double netSales;        // 순 매출 (수수료 및 할인이 반영된 금액)
+
+    @Column(name = "order_count", nullable = true)
+    private int orderCount;
 
     public void updateSettlement(Settlement settlement) {
         this.totalSales += settlement.getTotalSales();  // 기존 총 매출에 새로 넘어온 총 매출을 더함

@@ -1,8 +1,11 @@
 package com.v1.owner;
 
+import com.auth.SecurityContextHelper;
 import com.domain.order.dto.OrderResponse;
 import com.domain.order.service.OrderService;
 import com.domain.settlement.service.SettlementService;
+import com.domain.shop.service.ShopService;
+import com.domain.user.service.UserService;
 import com.v1.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -22,8 +24,17 @@ import java.util.UUID;
 @RequestMapping("/owners")
 public class OwnerController {
 
+    private final SecurityContextHelper securityContextHelper;
     private final OrderService orderService;
-    private final SettlementService settlementService;
+    private final ShopService shopService;
+
+    @GetMapping("/shopId")
+    public ResponseEntity<?> getShopId(){
+        String emailInToken = securityContextHelper.getEmailInToken();
+        UUID shopUUID = shopService.getShopIdByEmail(emailInToken);
+        SuccessResponse response = new SuccessResponse(true, "가게 ID 조회 성공", shopUUID);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping("/orders")
     public ResponseEntity<?> getOrders(
@@ -47,13 +58,5 @@ public class OwnerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/settlement")
-    public ResponseEntity<?> getSettlement(
-            @RequestParam UUID shopId,
-            @RequestParam LocalDate localDate
-            ){
-        Map<LocalDate, Double> monthlySettlement = settlementService.findMonthlySettlement(shopId, localDate);
-        SuccessResponse response = new SuccessResponse(true, "기간에 포함된 주문 조회 성공", monthlySettlement);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+
 }

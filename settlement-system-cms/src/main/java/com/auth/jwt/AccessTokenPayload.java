@@ -7,5 +7,4 @@ import java.util.Date;
 
 
 public record AccessTokenPayload(String email, Role roleEnum, Date issuedAt) {
-
 }

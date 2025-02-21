@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(force = true)
 public class LoginCommandDto {
     private final String email;
-
     private final String password;
 
     @Builder

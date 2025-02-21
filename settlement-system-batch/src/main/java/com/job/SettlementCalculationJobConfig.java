@@ -68,6 +68,9 @@ public class SettlementCalculationJobConfig {
                 .build();
     }
 
+    /**
+     * Chunk 에 쌓이지 않고, 메모리에 남아 있는 정산 정보를 저장시킨다.
+     */
     @Bean
     @JobScope
     public Step finalizeSettlementStep() {

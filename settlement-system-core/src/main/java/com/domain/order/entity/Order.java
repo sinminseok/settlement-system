@@ -5,9 +5,11 @@ import com.domain.shop.entity.Shop;
 import com.domain.order.constants.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 거래 내역 정보를 나타낼 Entity
@@ -21,8 +23,9 @@ import java.time.LocalDateTime;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @UuidGenerator
+    @Column(name = "order_id", nullable = false, updatable = false)
+    private UUID id;
 
     @Column(name = "price", nullable = false)
     private double price;

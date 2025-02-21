@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,13 +19,13 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public List<OrderResponse> getOrdersByPage(UUID shopId, int page, int size) {
+    public List<OrderResponse> getOrdersByPage(final UUID shopId, final int page, final int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startDateTime"));
         List<Order> orders = orderRepository.findByShopIdAndPage(shopId, pageable);
         return orders.stream().map(OrderResponse::from).toList();
     }
 
-    public List<OrderResponse> getOrdersByPeriod(UUID shopId, LocalDate startDate, LocalDate endDate){
+    public List<OrderResponse> getOrdersByPeriod(final UUID shopId, final LocalDate startDate, final LocalDate endDate){
         List<Order> orders = orderRepository.findByShopIdAndPeriod(shopId, startDate, endDate);
         return orders.stream().map(OrderResponse::from).toList();
     }

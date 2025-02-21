@@ -1,4 +1,5 @@
 package com.exception;
+import com.v1.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,21 +18,22 @@ import java.nio.charset.StandardCharsets;
 public class ExceptionResolver {
     private static final Logger logger = LogManager.getLogger(ExceptionResolver.class);
 
-    @ExceptionHandler({AuthException.class})
+    @ExceptionHandler({AuthException.class, EmailExistException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public ErrorResponse handleClientException(Exception exception) {
-        return new ErrorResponse((ExceptionBase) exception);
+    public SuccessResponse handleClientException(ExceptionBase exception) {
+        return new SuccessResponse(false, exception.getErrorMessage(), exception.getErrorCode().getCode());
     }
 
-    @ExceptionHandler({})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ResponseBody
-    public ErrorResponse handleServerException(HttpServletRequest request, Exception exception) {
-        // 서버 오류만 로그 기록
-        logException(request, (ExceptionBase) exception);
-        return new ErrorResponse((ExceptionBase) exception);
-    }
+//
+//    @ExceptionHandler({})
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    @ResponseBody
+//    public ErrorResponse handleServerException(HttpServletRequest request, Exception exception) {
+//        // 서버 오류만 로그 기록
+//        logException(request, (ExceptionBase) exception);
+//        return new ErrorResponse((ExceptionBase) exception);
+//    }
 
     private void logException(HttpServletRequest request, ExceptionBase exception) {
         String username = getAuthenticatedUsername();

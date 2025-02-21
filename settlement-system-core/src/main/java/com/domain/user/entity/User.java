@@ -31,15 +31,11 @@ public class User extends BaseTimeEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Setter
-    @Column(name = "refresh_token", nullable = true)
-    private String refreshToken;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
-    private List<Shop> shops = new ArrayList<>();
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Shop shop;
 
     @Builder
     public User(String email, String password, Role role){
@@ -47,5 +43,4 @@ public class User extends BaseTimeEntity {
         this.password = password;
         this.role = role;
     }
-
 }

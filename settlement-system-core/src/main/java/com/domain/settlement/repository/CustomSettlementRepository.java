@@ -11,4 +11,6 @@ public interface CustomSettlementRepository {
     List<Settlement> findByMonth(UUID shopId, LocalDate localDate);
 
     Optional<Settlement> findByShopIdAndSettlementDate(UUID shopId, LocalDate date);
+
+    List<Settlement> findByShopIdAndSettlementDateBetween(UUID shopId, LocalDate startDate, LocalDate endDate);
 }

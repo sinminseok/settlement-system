@@ -43,4 +43,15 @@ public class CustomSettlementRepositoryImpl implements CustomSettlementRepositor
         return Optional.ofNullable(settlement);
     }
 
+    @Override
+    public List<Settlement> findByShopIdAndSettlementDateBetween(UUID shopId, LocalDate startDate, LocalDate endDate) {
+        return query.selectFrom(QSettlement.settlement)
+                .where(
+                        QSettlement.settlement.shopId.eq(shopId),
+                        QSettlement.settlement.settlementDateTime.goe(startDate.atStartOfDay()),  // 시작 날짜 (00:00:00)
+                        QSettlement.settlement.settlementDateTime.loe(endDate.atTime(23, 59, 59, 999999))  // 종료 날짜 (23:59:59)
+                )
+                .fetch();
+    }
+
 }
