@@ -13,29 +13,27 @@ public class CookieService {
     @Value("${jwt.access-key-expiration-s}")
     private long accessKeyExpirationInS;
 
-    @Value("${jwt.refresh-key-expiration-s}")
-    private long refreshKeyExpirationInS;
-
     @Value("${server.servlet.context-path}")
-    private String contextPath; // contextPath = /
+    private String contextPath;
 
-    public ResponseCookie createAccessTokenCookie(String accessToken) {
+    public ResponseCookie createAccessTokenCookie(String accessToken, Duration maxAge) {
+
         return ResponseCookie.from(JwtMetadata.ACCESS_TOKEN, accessToken)
                 .httpOnly(true)
-                .secure(false)
-                .maxAge(accessKeyExpirationInS)
+                .secure(true)
+                .maxAge(maxAge)
                 .path(contextPath)
                 .sameSite("None")
                 .build();
     }
 
-    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from(JwtMetadata.REFRESH_TOKEN, refreshToken)
+    public ResponseCookie createAccessTokenCookie(String accessToken) {
+        return ResponseCookie.from(JwtMetadata.ACCESS_TOKEN, accessToken)
                 .httpOnly(true)
-                .secure(false)
-                .maxAge(refreshKeyExpirationInS)
+                .secure(true)
+                .maxAge(accessKeyExpirationInS)
                 .path(contextPath)
-                .sameSite("None")
+                .sameSite("Strict")
                 .build();
     }
 

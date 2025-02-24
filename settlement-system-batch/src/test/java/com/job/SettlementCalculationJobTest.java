@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.generator.NormalizedTransactionHelper.createNormalizedTransactions;
+import static com.generator.OrderTransactionHelper.createOrderTransactions;
 
 @SpringBatchTest
 @ActiveProfiles("test")
@@ -60,7 +60,7 @@ public class SettlementCalculationJobTest {
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2024,10,23,13,13);
         for(int i=0; i<10; i++){
-            List<OrderTransaction> normalizedTransactions = createNormalizedTransactions(UUID.randomUUID(), "SHOPNAME" + i, localDateTime);
+            List<OrderTransaction> normalizedTransactions = createOrderTransactions(UUID.randomUUID(), "SHOPNAME" + i, localDateTime);
             normalizedTransactions.stream()
                     .forEach(normalizedTransaction -> {
                         normalizedTransactionRepository.save(normalizedTransaction);
@@ -83,12 +83,11 @@ public class SettlementCalculationJobTest {
 
     @Test
     void 할인_적용_테스트() throws Exception {
-        //VIP_DISCOUNT == 10퍼센트 할인
-        //수수료(1개의 거래당) 1000원 할인
+        //VIP_DISCOUNT == 10퍼센트 할인 && 거래 수수료 1000원
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2024,10,23,13,13);
 
-        List<OrderTransaction> normalizedTransactions = createNormalizedTransactions(UUID.randomUUID(), "SHOPNAME", localDateTime);
+        List<OrderTransaction> normalizedTransactions = createOrderTransactions(UUID.randomUUID(), "SHOPNAME", localDateTime);
         normalizedTransactions.stream()
                 .forEach(normalizedTransaction -> normalizedTransactionRepository.save(normalizedTransaction));
 

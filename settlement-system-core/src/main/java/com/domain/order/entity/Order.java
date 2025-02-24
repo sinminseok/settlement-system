@@ -30,16 +30,13 @@ public class Order {
     @Column(name = "price", nullable = false)
     private double price;
 
-    // 거래 시작 시간
     @CreatedDate
     @Column(name = "start_date_time", nullable = false)
     private LocalDateTime startDateTime;
 
-    //거래 취소 시간
     @Column(name = "cancel_date_time", nullable = true)
     private LocalDateTime cancelDateTime;
 
-    //거래 종료 시간
     @Column(name = "completion_date_time", nullable = true)
     private LocalDateTime completionDateTime;
 

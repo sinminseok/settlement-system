@@ -27,6 +27,10 @@ public class RefreshToken {
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private User user;
 
+    @Column(name = "token")
+    @Setter
+    private String token;
+
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false)
@@ -34,7 +38,7 @@ public class RefreshToken {
 
 
     @Builder
-    public RefreshToken(User user) {
+    public RefreshToken(User user, String token) {
         this.user = user;
         this.createdAt = LocalDateTime.now();
     }

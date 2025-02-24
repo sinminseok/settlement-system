@@ -21,6 +21,5 @@ public class JwtFilterExceptionResolver implements FilterExceptionResolver<JwtEx
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.getWriter().write(new ObjectMapper().writeValueAsString(new SuccessResponse(false, exception.getErrorMessage(), exception.getErrorCode().getCode())));
-
     }
 }

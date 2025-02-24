@@ -50,10 +50,6 @@ public class JwtService {
         );
     }
 
-    public RefreshTokenPayload createRefreshTokenPayload(Claims payload) {
-        return new RefreshTokenPayload(payload.getSubject(), payload.getIssuedAt());
-    }
-
     public String createAccessToken(AccessTokenPayload jwtPayload) {
         return Jwts.builder()
                 .subject(jwtPayload.email())

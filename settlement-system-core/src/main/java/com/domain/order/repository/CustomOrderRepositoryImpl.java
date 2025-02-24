@@ -25,7 +25,7 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
     public List<Order> findByShopIdAndPage(UUID shopId, Pageable pageable) {
         return query.selectFrom(qOrder)
                 .where(qOrder.shop.id.eq(shopId))
-                .orderBy(qOrder.startDateTime.desc())  // 최신 거래 순 정렬
+                .orderBy(qOrder.startDateTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -33,12 +33,49 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
 
     @Override
     public List<Order> findByShopIdAndPeriod(UUID shopId, LocalDate startDate, LocalDate endDate) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();  // startDate의 시작 시간
-        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);  // endDate의 끝 시간
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         return query.selectFrom(qOrder)
-                .where(qOrder.shop.id.eq(shopId)  // shopId 필터링
-                        .and(qOrder.startDateTime.between(startDateTime, endDateTime)))  // startDateTime이 startDate와 endDate 사이에 포함되는지 확인
-                .orderBy(qOrder.startDateTime.desc())  // 최신 거래 순 정렬
+                .where(qOrder.shop.id.eq(shopId)
+                        .and(qOrder.startDateTime.between(startDateTime, endDateTime)))
+                .orderBy(qOrder.startDateTime.desc())
                 .fetch();
     }
+
+    @Override
+    public List<Order> findRecentOrders(UUID shopId, LocalDate today) {
+        LocalDateTime now = today.atTime(23, 59, 59);
+        return query.selectFrom(qOrder)
+                .where(qOrder.shop.id.eq(shopId)
+                        .and(qOrder.startDateTime.loe(now)))
+                .orderBy(qOrder.startDateTime.desc())
+                .limit(10)
+                .fetch();
+    }
+
+    @Override
+    public Integer findOrderCount(UUID shopId, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(23, 59, 59);
+        return query.select(qOrder.count())
+                .from(qOrder)
+                .where(
+                        qOrder.shop.id.eq(shopId),
+                        qOrder.startDateTime.between(startOfDay, endOfDay)
+                )
+                .fetchOne()
+                .intValue();
+    }
+
+    @Override
+    public int countByShopId(UUID shopId) {
+        Long count = query.select(qOrder.count())
+                .from(qOrder)
+                .where(qOrder.shop.id.eq(shopId))
+                .fetchOne();
+        return (count != null) ? count.intValue() : 0;
+    }
+
+
+
 }

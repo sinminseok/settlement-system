@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class NormalizedTransactionHelper {
+public class OrderTransactionHelper {
 
-    public static List<OrderTransaction> createNormalizedTransactions(UUID shopId, String shopName, LocalDateTime completionDateTime){
+    public static List<OrderTransaction> createOrderTransactions(UUID shopId, String shopName, LocalDateTime completionDateTime){
         List<OrderTransaction> response = new ArrayList<>();
 
         for(int i=0; i<10; i++) {

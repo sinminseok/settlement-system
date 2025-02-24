@@ -10,6 +10,9 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * 월별 정산 내역을 나타낼 entity
+ */
 @Entity
 @Getter
 @Builder
@@ -40,9 +43,4 @@ public class MonthlySettlement {
     @Column(name = "net_sales", nullable = true)
     private double netSales; // 순 매출 (수수료 및 할인이 반영된 금액)
 
-    public void updateBySettlement(Settlement settlement) {
-        this.totalSales += settlement.getTotalSales();
-        this.totalRefunds += settlement.getTotalRefunds();
-        this.netSales += settlement.getNetSales();
-    }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,11 +26,22 @@ public class OrderService {
         return orders.stream().map(OrderResponse::from).toList();
     }
 
+    public Integer getOrderCount(final UUID shopId) {
+        return orderRepository.countByShopId(shopId);
+    }
+
+    public Integer getTodayOrderCount(final UUID shopId) {
+        return orderRepository.findOrderCount(shopId, LocalDate.now());
+    }
+
     public List<OrderResponse> getOrdersByPeriod(final UUID shopId, final LocalDate startDate, final LocalDate endDate){
         List<Order> orders = orderRepository.findByShopIdAndPeriod(shopId, startDate, endDate);
         return orders.stream().map(OrderResponse::from).toList();
     }
 
-
+    public List<OrderResponse> getRecentOrders(final UUID shopId) {
+        List<Order> orders = orderRepository.findRecentOrders(shopId, LocalDate.now());
+        return orders.stream().map(OrderResponse::from).toList();
+    }
 
 }

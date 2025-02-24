@@ -9,12 +9,14 @@ import com.domain.settlement.repository.MonthlySettlementRepository;
 import com.domain.settlement.repository.SettlementRepository;
 import com.utils.OptionalUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class SettlementService {
 
     private final SettlementRepository settlementRepository;
     private final MonthlySettlementRepository monthlySettlementRepository;
+
 
     public Settlement findByIdAndDate(final UUID shopId, final LocalDate localDate){
         Optional<Settlement> byShopIdAndSettlementDate = settlementRepository.findByShopIdAndSettlementDate(shopId, localDate);
@@ -45,42 +48,12 @@ public class SettlementService {
                 ));
     }
 
-//    public DashboardResponse getDashboardResponse(final UUID shopId, final LocalDate date) {
-//        // 오늘의 Settlement 조회
-//        Settlement todaySettlement = OptionalUtil.getOrElseThrow(settlementRepository.findByShopIdAndSettlementDate(shopId, date), "존재하지 않는 정산 정보 입니다.");
-//        Settlement yesterdaySettlement = OptionalUtil.getOrElseThrow(settlementRepository.findByShopIdAndSettlementDate(shopId, date.minusDays(1)), "존재하지 않는 전날의 정산 정보 입니다.");
-//
-//        List<Double> weeklyAmounts = getWeeklyAmounts(shopId, date);
-//
-//        return toDashboardResponse();
-//    }
 
-//    private List<Double> getWeeklyAmounts(UUID shopId, LocalDate date){
-//        LocalDate startOfWeek = date.with(DayOfWeek.MONDAY);
-//        LocalDate endOfWeek = startOfWeek.plusDays(6);
-//
-//        List<Settlement> weeklySettlements = settlementRepository.findByShopIdAndSettlementDateBetween(shopId, startOfWeek, endOfWeek);
-//        List<Double> weeklySales = new ArrayList<>();
-//
-//        for (int i = 0; i < 7; i++) {
-//            LocalDate currentDay = startOfWeek.plusDays(i);
-//            Optional<Settlement> settlementForDay = weeklySettlements.stream()
-//                    .filter(s -> s.getSettlementDateTime().toLocalDate().equals(currentDay))
-//                    .findFirst();
-//            weeklySales.add(settlementForDay.map(Settlement::getNetSales).orElse(0.0));
-//        }
-//
-//    }
-
-//    private DashboardResponse toDashboardResponse(){
-//        return  DashboardResponse.builder()
-//                .todaySaleAmount(todaySettlement.getNetSales())
-//                .todayOrderAmount(todaySettlement.getOrderCount())
-//                .compareOrderAmount()
-//                .compareSaleAmount()
-//                .weeklyAmount(weeklySales)
-//                .recentOrders()
-//                .build();
-//    }
+    public List<Double> getWeeklySales(final UUID shopId) {
+        List<Settlement> weeklySettlement = settlementRepository.findWeeklySettlement(shopId, LocalDate.now());
+        return IntStream.range(0, 7)
+                .mapToObj(i -> i < weeklySettlement.size() ? weeklySettlement.get(i).getTotalSales() : 0.0)
+                .collect(Collectors.toList());
+    }
 
 }

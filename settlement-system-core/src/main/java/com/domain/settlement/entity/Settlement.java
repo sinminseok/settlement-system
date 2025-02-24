@@ -45,10 +45,4 @@ public class Settlement {
 
     @Column(name = "order_count", nullable = true)
     private int orderCount;
-
-    public void updateSettlement(Settlement settlement) {
-        this.totalSales += settlement.getTotalSales();  // 기존 총 매출에 새로 넘어온 총 매출을 더함
-        this.totalRefunds += settlement.getTotalRefunds();  // 기존 총 환불 금액에 새로 넘어온 환불 금액을 더함
-        this.netSales += settlement.getNetSales();  // 기존 순 매출에 새로 넘어온 순 매출을 더함
-    }
 }

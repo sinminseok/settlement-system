@@ -12,4 +12,10 @@ public interface CustomOrderRepository {
     List<Order> findByShopIdAndPage(UUID shopId, Pageable pageable);
 
     List<Order> findByShopIdAndPeriod(UUID shopId, LocalDate startDate, LocalDate endDate);
+
+    List<Order> findRecentOrders(UUID shopId, LocalDate today);
+
+    Integer findOrderCount(UUID shopId, LocalDate date);
+
+    int countByShopId(UUID shopId);
 }

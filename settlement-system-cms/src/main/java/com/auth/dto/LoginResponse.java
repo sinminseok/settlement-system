@@ -13,14 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(force = true)
 public class LoginResponse {
     private Role role;
-    private ResponseCookie refreshTokenCookie;
-    private ResponseCookie accessTokenCookie;
+    private String refreshToken;
+    private String accessToken;
 
     @Builder
-    public LoginResponse(Role role, ResponseCookie responseCookie, ResponseCookie refreshTokenCookie) {
+    public LoginResponse(Role role, String accessToken, String refreshToken) {
         this.role = role;
-        this.refreshTokenCookie = refreshTokenCookie;
-        this.accessTokenCookie = responseCookie;
+        this.refreshToken = refreshToken;
+        this.accessToken = accessToken;
     }
-
 }

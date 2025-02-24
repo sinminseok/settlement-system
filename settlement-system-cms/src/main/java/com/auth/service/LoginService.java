@@ -30,7 +30,6 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final CookieService cookieService;
 
     @Transactional
     public LoginResponse login(LoginCommandDto command){
@@ -38,14 +37,12 @@ public class LoginService {
         refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
         RefreshToken saved = refreshTokenRepository.save(RefreshToken.builder()
                         .user(user)
-                .build());
-
+                        .build());
         AccessTokenPayload accessTokenPayload = new AccessTokenPayload(user.getEmail(), user.getRole(), new Date());
         String accessToken = jwtService.createAccessToken(accessTokenPayload);
-        String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(saved.getId().toString(), new Date()));
-        ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
-        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(refreshToken);
-        return new LoginResponse(user.getRole(), accessTokenCookie, refreshTokenCookie);
+        String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(saved.getId(), new Date()));
+        saved.setToken(refreshToken);
+        return new LoginResponse(user.getRole(), accessToken, refreshToken);
     }
 
     private User getValidatedUser(String email, String password){

@@ -1,10 +1,14 @@
 package com.v1.owner;
 
 import com.auth.SecurityContextHelper;
+import com.domain.order.dto.InitOrderResponse;
 import com.domain.order.dto.OrderResponse;
 import com.domain.order.service.OrderService;
+import com.domain.settlement.dto.SettlementResponse;
+import com.domain.settlement.entity.Settlement;
 import com.domain.settlement.service.SettlementService;
 import com.domain.shop.service.ShopService;
+import com.domain.user.dto.OwnerDashBoardResponse;
 import com.domain.user.service.UserService;
 import com.v1.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,36 +31,32 @@ public class OwnerController {
     private final SecurityContextHelper securityContextHelper;
     private final OrderService orderService;
     private final ShopService shopService;
+    private final SettlementService settlementService;
+
+    @GetMapping("/dash-board")
+    public ResponseEntity<?> getDashBoard() {
+        String emailInToken = securityContextHelper.getEmailInToken();
+        UUID shopId = shopService.getShopIdByEmail(emailInToken);
+        OwnerDashBoardResponse ownerDashBoardResponse = getOwnerDashBoardResponse(shopId);
+        SuccessResponse response = new SuccessResponse(true, "Owner 대시보드 정보 조회", ownerDashBoardResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping("/shopId")
-    public ResponseEntity<?> getShopId(){
+    public ResponseEntity<?> getShopId() {
         String emailInToken = securityContextHelper.getEmailInToken();
         UUID shopUUID = shopService.getShopIdByEmail(emailInToken);
         SuccessResponse response = new SuccessResponse(true, "가게 ID 조회 성공", shopUUID);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/orders")
-    public ResponseEntity<?> getOrders(
-            @RequestParam UUID shopId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        List<OrderResponse> orders = orderService.getOrdersByPage(shopId, page, size);
-        SuccessResponse response = new SuccessResponse(true, "주문 페이징 조회 성공", orders);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    private OwnerDashBoardResponse getOwnerDashBoardResponse(UUID shopId) {
+        return OwnerDashBoardResponse.builder()
+                .shopId(shopId)
+                .recentOrders(orderService.getRecentOrders(shopId))
+                .todaySettlement(SettlementResponse.from(settlementService.findByIdAndDate(shopId, LocalDate.now())))
+                .todayOrderCount(orderService.getTodayOrderCount(shopId))
+                .weeklySales(settlementService.getWeeklySales(shopId))
+                .build();
     }
-
-    @GetMapping("/orders/period")
-    public ResponseEntity<?> getOrdersByPeriod(
-            @RequestParam UUID shopId,
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
-    ){
-        List<OrderResponse> orders = orderService.getOrdersByPeriod(shopId, startDate, endDate);
-        SuccessResponse response = new SuccessResponse(true, "기간에 포함된 주문 조회 성공", orders);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-
 }

@@ -12,5 +12,7 @@ public interface CustomSettlementRepository {
 
     Optional<Settlement> findByShopIdAndSettlementDate(UUID shopId, LocalDate date);
 
+    List<Settlement> findWeeklySettlement(UUID shopId, LocalDate date);
+
     List<Settlement> findByShopIdAndSettlementDateBetween(UUID shopId, LocalDate startDate, LocalDate endDate);
 }

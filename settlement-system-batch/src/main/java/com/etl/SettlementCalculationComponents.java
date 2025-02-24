@@ -1,29 +1,41 @@
 package com.etl;
 
-import com.domain.order.entity.OrderTransaction;
 import com.domain.settlement.entity.Settlement;
+import com.dto.SettlementAggregation;
 import com.parameters.DateParameter;
-import com.domain.settlement.repository.SettlementRepository;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class SettlementCalculationComponents {
 
-    private static UUID currentShopId = UUID.randomUUID();
-    private static Settlement currentSettlement;
 
-    public static JpaPagingItemReader<OrderTransaction> settlementReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
-        String query = "SELECT t FROM OrderTransaction t " +
-                "WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate " +
-                "ORDER BY t.shopId ASC"; // ShopId 로 정렬
-        return new JpaPagingItemReaderBuilder<OrderTransaction>()
+    public static JpaPagingItemReader<SettlementAggregation> settlementReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
+        String query = """
+            SELECT new com.dto.SettlementAggregation(
+                t.shopId,
+                t.shopName,
+                SUM(CASE WHEN t.status = 'CANCEL' THEN t.price ELSE 0 END),
+                SUM(CASE WHEN t.status <> 'CANCEL' THEN t.price ELSE 0 END),
+                SUM(CASE WHEN t.status <> 'CANCEL' THEN 
+                    CASE 
+                        WHEN t.discountType = 'VIP_DISCOUNT' THEN (t.price * 0.9 - 1000)
+                        WHEN t.discountType = 'FIRST_ORDER_DISCOUNT' THEN (t.price * 0.95 - 1000)
+                        ELSE (t.price - 1000)  
+                    END
+                ELSE 0 END),
+                   MAX(t.completionDateTime)
+            )
+            FROM OrderTransaction t
+            WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate
+            GROUP BY t.shopId
+        """;
+
+        return new JpaPagingItemReaderBuilder<SettlementAggregation>()
                 .name("settlementReader")
                 .entityManagerFactory(entityManagerFactory)
                 .pageSize(100)
@@ -32,25 +44,17 @@ public class SettlementCalculationComponents {
                 .build();
     }
 
-    public static ItemProcessor<OrderTransaction, Settlement> settlementItemProcessor() {
-        return transaction -> {
-            if (isSameShop(transaction)) {
-                currentSettlement.updateSettlement(transaction.toInitSettlement());
-                return null;
-            } else {
-                // 즉, 서로 다른 Shop 이 조회되는 순간 Chunk 에 Settlement 를 쌓는다.
-                Settlement previousSettlement = currentSettlement;
-                updateCurrentSettlement(transaction);
-                return previousSettlement;
-            }
+    public static ItemProcessor<SettlementAggregation, Settlement> settlementItemProcessor() {
+        return aggregation -> {
+            return Settlement.builder()
+                    .shopId(aggregation.getShopId())
+                    .shopName(aggregation.getShopName())
+                    .totalSales(aggregation.getTotalSales())
+                    .totalRefunds(aggregation.getTotalRefunds())
+                    .netSales(aggregation.getNetSales())
+                    .settlementDateTime(aggregation.getSettlementDateTime())
+                    .build();
         };
-    }
-
-    @Transactional
-    public static void finalizeSettlement(SettlementRepository settlementRepository) {
-        if (currentSettlement != null) {
-            settlementRepository.save(currentSettlement);
-        }
     }
 
     public static JpaItemWriter<Settlement> settlementJpaItemWriter(EntityManagerFactory entityManagerFactory) {
@@ -58,14 +62,4 @@ public class SettlementCalculationComponents {
         writer.setEntityManagerFactory(entityManagerFactory);
         return writer;
     }
-
-    private static boolean isSameShop(OrderTransaction transaction) {
-        return currentShopId.equals(transaction.getShopId());
-    }
-
-    private static void updateCurrentSettlement(OrderTransaction transaction) {
-        currentSettlement = transaction.toInitSettlement();
-        currentShopId = transaction.getShopId();
-    }
-
 }

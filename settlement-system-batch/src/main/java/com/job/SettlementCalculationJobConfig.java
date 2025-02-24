@@ -1,10 +1,9 @@
 package com.job;
 
-import com.domain.order.entity.OrderTransaction;
 import com.domain.settlement.entity.Settlement;
+import com.dto.SettlementAggregation;
 import com.etl.SettlementCalculationComponents;
 import com.parameters.DateParameter;
-import com.domain.settlement.repository.SettlementRepository;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +15,13 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 
 /**
- * 일별 정산 시스템
+ * 일별 정산 시스템 (하루에 한번 실행)
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +33,6 @@ public class SettlementCalculationJobConfig {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
-    private final SettlementRepository settlementRepository;
     private final EntityManagerFactory entityManagerFactory;
     private final DateParameter jobParameter;
 
@@ -50,36 +47,20 @@ public class SettlementCalculationJobConfig {
     public Job settlementJob() {
         return new JobBuilder(JOB_NAME, jobRepository)
                 .start(settlementStep())
-                .next(finalizeSettlementStep())
                 .build();
     }
 
     @Bean
     @JobScope
     public Step settlementStep() {
-        JpaPagingItemReader<OrderTransaction> reader = SettlementCalculationComponents.settlementReader(entityManagerFactory, jobParameter);
-        ItemProcessor<OrderTransaction, Settlement> processor = SettlementCalculationComponents.settlementItemProcessor();
+        JpaPagingItemReader<SettlementAggregation> reader = SettlementCalculationComponents.settlementReader(entityManagerFactory, jobParameter);
+        ItemProcessor<SettlementAggregation, Settlement> processor = SettlementCalculationComponents.settlementItemProcessor();
         JpaItemWriter<Settlement> writer = SettlementCalculationComponents.settlementJpaItemWriter(entityManagerFactory);
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<OrderTransaction, Settlement>chunk(100, transactionManager)
+                .<SettlementAggregation, Settlement>chunk(100, transactionManager)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
                 .build();
     }
-
-    /**
-     * Chunk 에 쌓이지 않고, 메모리에 남아 있는 정산 정보를 저장시킨다.
-     */
-    @Bean
-    @JobScope
-    public Step finalizeSettlementStep() {
-        return new StepBuilder("finalizeSettlementStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    SettlementCalculationComponents.finalizeSettlement(settlementRepository);
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
-    }
-
 }

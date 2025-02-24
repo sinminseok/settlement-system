@@ -3,14 +3,16 @@ package com.auth.jwt;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import com.auth.FilterExceptionResolver;
 import com.auth.RequestMatcherHolder;
-import com.auth.dto.JwtMetadata;
+import com.auth.dto.LoginResponse;
 import com.domain.user.entity.RefreshToken;
+import com.domain.user.entity.User;
 import com.domain.user.repository.RefreshTokenRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utils.OptionalUtil;
+import com.v1.response.SuccessResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,11 +28,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import static com.auth.jwt.JwtExtractor.*;
 
 
 @Slf4j
@@ -42,6 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final FilterExceptionResolver<JwtException> jwtFilterExceptionResolver;
     private final RequestMatcherHolder requestMatcherHolder;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -55,32 +59,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void checkRefreshToken(HttpServletRequest request, HttpServletResponse response,
                                    FilterChain filterChain) throws ServletException, IOException {
-        // AccessToken이 유효하지 않으면 refreshToken을 쿠키에서 추출하여 검증
-        String refreshToken = getRefreshTokenFromCookie(request);
+        String refreshToken = extractRefreshTokenFromHeader(request);
         try {
-            // RefreshToken을 검증하고, 새로운 AccessToken을 발급
-            Claims refreshClaims = jwtService.verifyToken(refreshToken);
-            AccessTokenPayload refreshTokenPayload = jwtService.createAccessTokenPayload(refreshClaims);
-            String email = refreshTokenPayload.email();
-            String role = refreshTokenPayload.roleEnum().name();
-            GrantedAuthority authority = new SimpleGrantedAuthority(role);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, List.of(authority));
+            jwtService.verifyToken(refreshToken);
+            RefreshToken beforeRefreshToken = OptionalUtil.getOrElseThrow((refreshTokenRepository.findByToken(refreshToken)), "존재하지 않는 refreshToken 입니다.");
+            User user = beforeRefreshToken.getUser();
+            GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
+            Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, List.of(authority));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            RefreshToken beforeRefreshToken = OptionalUtil.getOrElseThrow(refreshTokenRepository.findById(getRefreshTokenFromCookie(request)), "존재하지 않는 refreshToken 입니다.");
             AccessTokenPayload accessTokenPayload = new AccessTokenPayload(beforeRefreshToken.getUser().getEmail(), beforeRefreshToken.getUser().getRole(), new Date());
             String newAccessToken = jwtService.createAccessToken(accessTokenPayload);
             response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);
-            filterChain.doFilter(request, response);
-
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .refreshToken(beforeRefreshToken.getToken())
+                    .role(user.getRole())
+                    .accessToken(newAccessToken)
+                    .build();
+            SuccessResponse successResponse = new SuccessResponse(true, "토큰 재발급", loginResponse);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(HttpServletResponse.SC_OK);
+            String jsonResponse = objectMapper.writeValueAsString(successResponse);
+            response.getWriter().write(jsonResponse);
         } catch (JwtException refreshEx) {
-            logger.info("Failed to authorize/authenticate with refresh token due to " + refreshEx.getMessage());
             jwtFilterExceptionResolver.setResponse(response, refreshEx);
         }
     }
 
     private void checkAccessToken(HttpServletRequest request, HttpServletResponse response,
                                   FilterChain filterChain) throws ServletException, IOException {
-        final String accessToken = getAccessTokenFromHeader(request);
+        final String accessToken = extractAccessTokenFromHeader(request);
         Claims claims = jwtService.verifyToken(accessToken);
         AccessTokenPayload accessTokenPayload = jwtService.createAccessTokenPayload(claims);
         var email = accessTokenPayload.email();
@@ -91,31 +99,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // Authorization 헤더에서 AccessToken 추출
-    private String getAccessTokenFromHeader(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new JwtException("Missing or invalid Authorization header");
-        }
-        return authorizationHeader.substring(7);  // "Bearer "을 제외한 토큰 값 추출
-    }
-
-    // 쿠키에서 RefreshToken 추출
-    private String getRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            throw new JwtException("Missing cookies");
-        }
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(JwtMetadata.REFRESH_TOKEN)) {
-                if (cookie.getValue() == null || cookie.getValue().isEmpty()) {
-                    throw new JwtException("Empty refresh token in cookie");
-                }
-                return cookie.getValue();
-            }
-        }
-        throw new JwtException("Missing refresh token");
-    }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
