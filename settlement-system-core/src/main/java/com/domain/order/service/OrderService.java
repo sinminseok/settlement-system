@@ -26,6 +26,10 @@ public class OrderService {
         return orders.stream().map(OrderResponse::from).toList();
     }
 
+    public Integer getPeriodCount(final UUID shopId, final LocalDate startDate, final LocalDate endDate){
+        return orderRepository.countByPeriod(shopId, startDate, endDate);
+    }
+
     public Integer getOrderCount(final UUID shopId) {
         return orderRepository.countByShopId(shopId);
     }
@@ -34,8 +38,9 @@ public class OrderService {
         return orderRepository.findOrderCount(shopId, LocalDate.now());
     }
 
-    public List<OrderResponse> getOrdersByPeriod(final UUID shopId, final LocalDate startDate, final LocalDate endDate){
-        List<Order> orders = orderRepository.findByShopIdAndPeriod(shopId, startDate, endDate);
+    public List<OrderResponse> getOrdersByPeriod(final UUID shopId, final int page, final int size,final LocalDate startDate, final LocalDate endDate){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startDateTime"));
+        List<Order> orders = orderRepository.findByShopIdAndPeriod(shopId, pageable, startDate, endDate);
         return orders.stream().map(OrderResponse::from).toList();
     }
 

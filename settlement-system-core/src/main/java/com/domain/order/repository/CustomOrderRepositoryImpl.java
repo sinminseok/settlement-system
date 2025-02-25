@@ -32,7 +32,7 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
     }
 
     @Override
-    public List<Order> findByShopIdAndPeriod(UUID shopId, LocalDate startDate, LocalDate endDate) {
+    public List<Order> findByShopIdAndPeriod(UUID shopId, Pageable pageable,LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         return query.selectFrom(qOrder)
@@ -73,6 +73,22 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
                 .from(qOrder)
                 .where(qOrder.shop.id.eq(shopId))
                 .fetchOne();
+        return (count != null) ? count.intValue() : 0;
+    }
+
+    @Override
+    public int countByPeriod(UUID shopId, LocalDate startDate, LocalDate endDate) {
+        // 시작 날짜와 종료 날짜를 LocalDateTime으로 변환
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59); // 하루의 마지막 시간까지 포함
+
+        // 기간에 해당하는 주문 개수 카운트
+        Long count = query.select(qOrder.count())
+                .from(qOrder)
+                .where(qOrder.shop.id.eq(shopId)
+                        .and(qOrder.startDateTime.between(startDateTime, endDateTime)))
+                .fetchOne();
+
         return (count != null) ? count.intValue() : 0;
     }
 

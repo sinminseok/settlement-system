@@ -3,6 +3,7 @@ package com.domain.shop.service;
 import com.domain.shop.dto.ShopResponse;
 import com.domain.shop.entity.Shop;
 import com.domain.shop.repository.ShopRepository;
+import com.utils.OptionalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +22,8 @@ public class ShopService {
     private final ShopRepository shopRepository;
 
     public UUID getShopIdByEmail(String email){
-        return shopRepository.findByUserEmail(email).getId();
+        Shop shop = OptionalUtil.getOrElseThrow(shopRepository.findByUserEmail(email), "가게가 존재하지 않습니다.");
+        return shop.getId();
     }
 
     public List<ShopResponse> getAll(){

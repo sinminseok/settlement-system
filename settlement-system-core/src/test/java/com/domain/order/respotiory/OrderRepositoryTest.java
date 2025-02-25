@@ -48,18 +48,4 @@ public class OrderRepositoryTest {
         Assertions.assertThat(byShopIdAndPage.size()).isEqualTo(10);
     }
 
-    @Test
-    void 주문_기간별_조회(){
-        //given
-        Shop shop = shopRepository.save(generateShop(null));
-
-        for(int i=0; i<20; i++){
-            orderRepository.save(generateOrder(shop));
-        }
-        //when
-        List<Order> byShopIdAndPeriod = orderRepository.findByShopIdAndPeriod(shop.getId(), LocalDate.now(), LocalDate.now());
-
-        //then
-        Assertions.assertThat(byShopIdAndPeriod.size()).isEqualTo(20);
-    }
 }

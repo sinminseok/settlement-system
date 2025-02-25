@@ -25,7 +25,7 @@ public class OrderController {
 
     @GetMapping("/init")
     public ResponseEntity<?> getInitOrders(
-            @RequestParam UUID shopId
+            @RequestParam(name = "shopId")  UUID shopId
     ) {
         Integer orderCount = orderService.getOrderCount(shopId);
         List<OrderResponse> orders = orderService.getOrdersByPage(shopId, 0, 10);
@@ -39,23 +39,41 @@ public class OrderController {
 
     @GetMapping()
     public ResponseEntity<?> getOrders(
-            @RequestParam UUID shopId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(name = "shopId") UUID shopId,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
     ) {
         List<OrderResponse> orders = orderService.getOrdersByPage(shopId, page, size);
         SuccessResponse response = new SuccessResponse(true, "주문 페이징 조회 성공", orders);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/init/period")
+    public ResponseEntity<?> getOrdersByPeriod(
+            @RequestParam(name = "shopId") UUID shopId,
+            @RequestParam(name = "startDate") LocalDate startDate,
+            @RequestParam(name = "endDate") LocalDate endDate
+    ) {
+        Integer totalCount = orderService.getPeriodCount(shopId, startDate, endDate);
+        List<OrderResponse> orders = orderService.getOrdersByPeriod(shopId,0,10, startDate, endDate);
+        InitOrderResponse initOrderResponse = InitOrderResponse.builder()
+                .orderCount(totalCount)
+                .orderResponses(orders)
+                .build();
+        SuccessResponse response = new SuccessResponse(true, "기간에 포함된 초기 주문 조회 성공", initOrderResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/period")
     public ResponseEntity<?> getOrdersByPeriod(
-            @RequestParam UUID shopId,
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
+            @RequestParam(name = "shopId") UUID shopId,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "startDate") LocalDate startDate,
+            @RequestParam(name = "endDate") LocalDate endDate
     ) {
-        List<OrderResponse> orders = orderService.getOrdersByPeriod(shopId, startDate, endDate);
-        SuccessResponse response = new SuccessResponse(true, "기간에 포함된 주문 조회 성공", orders);
+        List<OrderResponse> orders = orderService.getOrdersByPeriod(shopId, page, size, startDate, endDate);
+        SuccessResponse response = new SuccessResponse(true, "기간에 포함된 주문 페이징 조회 성공", orders);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

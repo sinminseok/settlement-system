@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -42,7 +43,7 @@ public class CustomShopRepositoryImpl implements CustomShopRepository {
     }
 
     @Override
-    public Shop findByUserEmail(String email) {
+    public Optional<Shop> findByUserEmail(String email) {
         QUser user = QUser.user;
         QShop shop = QShop.shop;
 
@@ -50,12 +51,16 @@ public class CustomShopRepositoryImpl implements CustomShopRepository {
                 .from(user)
                 .where(user.email.eq(email))
                 .fetchOne();
+
         if (userId == null) {
-            return null;
+            return Optional.empty(); // 🔹 userId가 없으면 빈 Optional 반환
         }
+
         Shop shop1 = query.selectFrom(shop)
                 .where(shop.user.id.eq(userId))
                 .fetchOne();
-        return shop1;
+
+        return Optional.ofNullable(shop1); // 🔹 shop1이 null일 수도 있으므로 Optional.ofNullable 사용
     }
+
 }
