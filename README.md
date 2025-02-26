@@ -19,7 +19,8 @@
 ### 클라이언트 화면
 |로그인|메인 화면|정산 달력|
 |:--:|:---:|:---:|
-|<img src="https://github.com/user-attachments/assets/5956f026-fa73-4dd2-a3e0-c11cc77ba4e8" width="500"/>|<img src="https://github.com/user-attachments/assets/1fb81c90-1810-4ca2-af96-4a14e9cc38d3" width="500"/>|<img src="https://github.com/user-attachments/assets/8d330cac-ec04-4165-ab6c-0d47b8e2fd61" width="500"/>
+|<img src="https://github.com/user-attachments/assets/96d21658-cb33-4b19-a92f-4a8606724a60" width="900" height="500" />
+|<img src="https://github.com/user-attachments/assets/1fb81c90-1810-4ca2-af96-4a14e9cc38d3" width="500"/>|<img src="https://github.com/user-attachments/assets/8d330cac-ec04-4165-ab6c-0d47b8e2fd61" width="500"/>
 
 |주문 내역|주문 상세 내역|
 |:--:|:---:|
