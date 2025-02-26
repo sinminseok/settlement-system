@@ -68,11 +68,6 @@ subprojects {
 
 }
 
-project(':settlement-system-api') {
-	dependencies {
-		implementation project(':settlement-system-core')
-	}
-}
 
 project(':settlement-system-cms') {
 	dependencies {

@@ -41,6 +41,7 @@ public class Order {
     private LocalDateTime completionDateTime;
 
     @Enumerated(EnumType.STRING)
+    @Setter
     private OrderStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)

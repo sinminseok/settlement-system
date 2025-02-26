@@ -1,13 +1,16 @@
 package com.domain.order.service;
 
+import com.domain.order.dto.OrderPatchRequest;
 import com.domain.order.dto.OrderResponse;
 import com.domain.order.entity.Order;
 import com.domain.order.repository.OrderRepository;
+import com.utils.OptionalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,4 +52,14 @@ public class OrderService {
         return orders.stream().map(OrderResponse::from).toList();
     }
 
+    @Transactional
+    public void changeStatus(final OrderPatchRequest orderPatchRequest) {
+        Order order = OptionalUtil.getOrElseThrow(orderRepository.findById(orderPatchRequest.getOrderId()), "존재하지 않는 주문 ID 입니다.");
+        order.setStatus(orderPatchRequest.getOrderStatus());
+    }
+
+    @Transactional
+    public void deleteById(final UUID orderId) {
+        orderRepository.deleteById(orderId);
+    }
 }

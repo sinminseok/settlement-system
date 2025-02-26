@@ -89,7 +89,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void checkAccessToken(HttpServletRequest request, HttpServletResponse response,
                                   FilterChain filterChain) throws ServletException, IOException {
         final String accessToken = extractAccessTokenFromHeader(request);
-        System.out.println("accessToken ==== " + accessToken);
         Claims claims = jwtService.verifyToken(accessToken);
         AccessTokenPayload accessTokenPayload = jwtService.createAccessTokenPayload(claims);
         var email = accessTokenPayload.email();

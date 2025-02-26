@@ -1,6 +1,5 @@
 package com.domain.order.repository;
 
-
 import com.domain.order.entity.Order;
 import com.domain.order.entity.QOrder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -39,6 +38,8 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
                 .where(qOrder.shop.id.eq(shopId)
                         .and(qOrder.startDateTime.between(startDateTime, endDateTime)))
                 .orderBy(qOrder.startDateTime.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
     }
 
