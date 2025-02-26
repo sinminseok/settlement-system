@@ -16,10 +16,9 @@
 **Frontend** : `Flutter`  
 **Devops** : `Docker`, `Jenkis`, `Aws Ec2`
 
-### 클라이언트 화면
 
 <details>
-  <summary><b>📍 전체 보기</b></summary>
+  <summary><b>📍 클라이언트 화면</b></summary>
   
 |로그인|
 |:--:|
@@ -65,12 +64,10 @@
 
 </details>
 
-### 기능 명세서
 
-----
 
 <details>
-  <summary><b>📍 전체 보기</b></summary>
+  <summary><b>📍 기능 명세서</b></summary>
 
 ### 업주 도메인
 1. 주문 내역 조회
