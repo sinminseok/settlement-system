@@ -29,7 +29,7 @@ public class MonthlySettlementComponents {
         WHERE FUNCTION('YEAR', s.settlementDateTime) = :year
         AND FUNCTION('MONTH', s.settlementDateTime) = :month
         GROUP BY s.shopId, s.shopName
-    """;
+        """;
 
         return new JpaPagingItemReaderBuilder<SettlementAggregation>()
                 .name("monthlySettlementReader")

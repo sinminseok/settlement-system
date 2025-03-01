@@ -13,6 +13,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +54,7 @@ public class SettlementCalculationJobConfig {
     @Bean
     @JobScope
     public Step settlementStep() {
-        JpaPagingItemReader<SettlementAggregation> reader = SettlementCalculationComponents.settlementReader(entityManagerFactory, jobParameter);
+        ItemReader<SettlementAggregation> reader = SettlementCalculationComponents.settlementReader(entityManagerFactory, jobParameter);
         ItemProcessor<SettlementAggregation, Settlement> processor = SettlementCalculationComponents.settlementItemProcessor();
         JpaItemWriter<Settlement> writer = SettlementCalculationComponents.settlementJpaItemWriter(entityManagerFactory);
         return new StepBuilder(STEP_NAME, jobRepository)

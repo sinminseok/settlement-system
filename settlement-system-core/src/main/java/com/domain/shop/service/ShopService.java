@@ -34,7 +34,7 @@ public class ShopService {
     }
 
     public List<ShopResponse> getShopByPage(int page, int size){
-        Pageable pageable = PageRequest.of(page, size); // 정렬 기준 추가
+        Pageable pageable = PageRequest.of(page, size);
         Page<Shop> all = shopRepository.findAll(pageable);
         return all.stream().map(ShopResponse::from).toList();
     }

@@ -1,48 +1,74 @@
 package com.etl;
 
+import com.domain.order.constants.DiscountType;
+import com.domain.order.constants.OrderStatus;
+import com.domain.order.entity.QOrderTransaction;
 import com.domain.settlement.entity.Settlement;
 import com.dto.SettlementAggregation;
 import com.parameters.DateParameter;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.reader.QuerydslPagingItemReader;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.function.Function;
 
 public class SettlementCalculationComponents {
 
 
-    public static JpaPagingItemReader<SettlementAggregation> settlementReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
-        String query = """
-            SELECT new com.dto.SettlementAggregation(
-                t.shopId,
-                t.shopName,
-                SUM(CASE WHEN t.status = 'CANCEL' THEN t.price ELSE 0 END),
-                SUM(CASE WHEN t.status <> 'CANCEL' THEN t.price ELSE 0 END),
-                SUM(CASE WHEN t.status <> 'CANCEL' THEN 
-                    CASE 
-                        WHEN t.discountType = 'VIP_DISCOUNT' THEN (t.price * 0.9 - 1000)
-                        WHEN t.discountType = 'FIRST_ORDER_DISCOUNT' THEN (t.price * 0.95 - 1000)
-                        ELSE (t.price - 1000)  
-                    END
-                ELSE 0 END),
-                   MAX(t.completionDateTime)
-            )
-            FROM OrderTransaction t
-            WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate
-            GROUP BY t.shopId
-        """;
+    public static ItemReader<SettlementAggregation> settlementReader(EntityManagerFactory entityManagerFactory, DateParameter requestDate) {
+        QOrderTransaction t = QOrderTransaction.orderTransaction;
 
-        return new JpaPagingItemReaderBuilder<SettlementAggregation>()
-                .name("settlementReader")
-                .entityManagerFactory(entityManagerFactory)
-                .pageSize(100)
-                .queryString(query)
-                .parameterValues(Map.of("requestDate", dateParameter.getRequestDate()))
-                .build();
+        NumberExpression<Double> cancelPriceSum = new CaseBuilder()
+                .when(t.status.eq(OrderStatus.CANCEL)).then(t.price)
+                .otherwise(0.0)
+                .sum();
+
+        NumberExpression<Double> nonCancelPriceSum = new CaseBuilder()
+                .when(t.status.ne(OrderStatus.CANCEL)).then(t.price)
+                .otherwise(0.0)
+                .sum();
+
+        NumberExpression<Double> discountedPriceSum = new CaseBuilder()
+                .when(t.status.ne(OrderStatus.CANCEL))
+                .then(new CaseBuilder()
+                        .when(t.discountType.eq(DiscountType.VIP_DISCOUNT))
+                        .then(t.price.multiply(0.9).subtract(1000))
+                        .when(t.discountType.eq(DiscountType.FIRST_ORDER_DISCOUNT))
+                        .then(t.price.multiply(0.95).subtract(1000))
+                        .otherwise(t.price.subtract(1000)))
+                .otherwise(0.0)
+                .sum();
+
+        Function<JPAQueryFactory, JPAQuery<SettlementAggregation>> queryFunction = queryFactory ->
+                queryFactory.select(Projections.constructor(SettlementAggregation.class,
+                                t.shopId,
+                                t.shopName,
+                                cancelPriceSum,
+                                nonCancelPriceSum,
+                                discountedPriceSum,
+                                t.completionDateTime.max()
+                        ))
+                        .from(t)
+                        .where(t.completionDateTime.year().eq(requestDate.getRequestDate().getYear())
+                                .and(t.completionDateTime.month().eq(requestDate.getRequestDate().getMonthValue()))
+                                .and(t.completionDateTime.dayOfMonth().eq(requestDate.getRequestDate().getDayOfMonth())))
+                        .groupBy(t.shopId);
+
+        return new QuerydslPagingItemReader<>(entityManagerFactory, 100, queryFunction);
     }
+
 
     public static ItemProcessor<SettlementAggregation, Settlement> settlementItemProcessor() {
         return aggregation -> {
