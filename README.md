@@ -16,23 +16,58 @@
 **Frontend** : `Flutter`  
 **Devops** : `Docker`, `Jenkis`, `Aws Ec2`
 
-### 클라이언트 화면
-|로그인|메인 화면|정산 달력|
-|:--:|:---:|:---:|
-|<img src="https://github.com/user-attachments/assets/5956f026-fa73-4dd2-a3e0-c11cc77ba4e8" width="500"/>|<img src="https://github.com/user-attachments/assets/1fb81c90-1810-4ca2-af96-4a14e9cc38d3" width="500"/>|<img src="https://github.com/user-attachments/assets/8d330cac-ec04-4165-ab6c-0d47b8e2fd61" width="500"/>
-
-|주문 내역|주문 상세 내역|
-|:--:|:---:|
-|<img src="https://github.com/user-attachments/assets/5956f026-fa73-4dd2-a3e0-c11cc77ba4e8" width="500"/>|<img src="https://github.com/user-attachments/assets/1fb81c90-1810-4ca2-af96-4a14e9cc38d3" width="500"/>
-
-----
-
-### 기능 명세서
-
-----
 
 <details>
-  <summary><b>📍 전체 보기</b></summary>
+  <summary><b>📍 클라이언트 화면</b></summary>
+  
+|로그인|
+|:--:|
+|<img src="https://github.com/user-attachments/assets/96d21658-cb33-4b19-a92f-4a8606724a60" width="1400" height="500" />
+
+|메인 화면|
+|:--:|
+|<img src="https://github.com/user-attachments/assets/a6f86f8f-6302-4d9e-a294-b1f88b7fc489" width="1400" height="500" />
+
+|정산 달력|
+|:--:|
+|<img src="https://github.com/user-attachments/assets/c65e6fe7-16e2-4a35-bc79-ee7f0807ea8f" width="1400" height="500" />
+
+|주문 내역|
+|:--:|
+|<img src="https://github.com/user-attachments/assets/692b9450-8c29-4bd7-a582-2e479f072c22" width="1400" height="500" />
+
+|주문 상세 내역|
+|:--:|
+|<img src="https://github.com/user-attachments/assets/2261b1fd-2b39-441e-89f5-cffc6a875cd8" width="1400" height="500" />
+
+</details>
+
+
+<details>
+<summary><b>📖 개발 기록</b></summary>
+
+  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; width: 250px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h4><a href="https://comumu.tistory.com/118" target="_blank" style="color: #007bff; text-decoration: none;">Spring Batch 로 정산 시스템 만들어보기 (1)</a></h4>
+  </div>
+
+  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; width: 250px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h4><a href="https://comumu.tistory.com/120" target="_blank" style="color: #007bff; text-decoration: none;">Spring Batch 로 정산 시스템 만들어보기 (2)</a></h4>
+  </div>
+
+  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; width: 250px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h4><a href="https://comumu.tistory.com/121" target="_blank" style="color: #007bff; text-decoration: none;">Spring Batch 로 정산 시스템 만들어보기 (3)</a></h4>
+  </div>
+
+  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; width: 250px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h4><a href="https://comumu.tistory.com/123" target="_blank" style="color: #007bff; text-decoration: none;">Spring Batch 로 정산 시스템 만들어보기 (4)</a></h4>
+  </div>
+
+</details>
+
+
+
+<details>
+  <summary><b>📍 기능 명세서</b></summary>
 
 ### 업주 도메인
 1. 주문 내역 조회
