@@ -1,6 +1,7 @@
 package com.v1.order;
 
 import com.domain.order.dto.InitOrderResponse;
+import com.domain.order.dto.OrderFilterRequest;
 import com.domain.order.dto.OrderPatchRequest;
 import com.domain.order.dto.OrderResponse;
 import com.domain.order.service.OrderService;
@@ -35,7 +36,9 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping()
+
+
+    @GetMapping
     public ResponseEntity<?> getOrders(
             @RequestParam(name = "shopId") UUID shopId,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -72,6 +75,18 @@ public class OrderController {
     ) {
         List<OrderResponse> orders = orderService.getOrdersByPeriod(shopId, page, size, startDate, endDate);
         SuccessResponse response = new SuccessResponse(true, "기간에 포함된 주문 페이징 조회 성공", orders);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/init/filter")
+    public ResponseEntity<?> getOrdersByFilter(@RequestBody OrderFilterRequest orderFilterRequest){
+        List<OrderResponse> orders = orderService.getOrdersByFilter(0, 10, orderFilterRequest);
+        Integer totalCount = orderService.getOrderCountByFiler(orderFilterRequest);
+        InitOrderResponse initOrderResponse = InitOrderResponse.builder()
+                .orderCount(totalCount)
+                .orderResponses(orders)
+                .build();
+        SuccessResponse response = new SuccessResponse(true, "필터링된 초기 주문 조회 성공", initOrderResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

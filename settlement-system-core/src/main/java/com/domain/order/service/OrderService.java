@@ -1,5 +1,6 @@
 package com.domain.order.service;
 
+import com.domain.order.dto.OrderFilterRequest;
 import com.domain.order.dto.OrderPatchRequest;
 import com.domain.order.dto.OrderResponse;
 import com.domain.order.entity.Order;
@@ -37,6 +38,10 @@ public class OrderService {
         return orderRepository.countByShopId(shopId);
     }
 
+    public Integer getOrderCountByFiler(final OrderFilterRequest orderFilterRequest){
+        return orderRepository.countByPeriodAndStatus(orderFilterRequest.getOrderStatus(), orderFilterRequest.getStartTime(), orderFilterRequest.getEndTime());
+    }
+
     public Integer getTodayOrderCount(final UUID shopId) {
         return orderRepository.findOrderCount(shopId, LocalDate.now());
     }
@@ -52,6 +57,12 @@ public class OrderService {
         return orders.stream().map(OrderResponse::from).toList();
     }
 
+    public List<OrderResponse> getOrdersByFilter(int page, int size, final OrderFilterRequest orderFilterRequest){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startDateTime"));
+        List<Order> orders = orderRepository.findByFilterAndPage(orderFilterRequest.getOrderStatus(), orderFilterRequest.getStartTime(), orderFilterRequest.getEndTime(), pageable);
+        return orders.stream().map(OrderResponse::from).toList();
+    }
+
     @Transactional
     public void changeStatus(final OrderPatchRequest orderPatchRequest) {
         Order order = OptionalUtil.getOrElseThrow(orderRepository.findById(orderPatchRequest.getOrderId()), "존재하지 않는 주문 ID 입니다.");
@@ -62,4 +73,6 @@ public class OrderService {
     public void deleteById(final UUID orderId) {
         orderRepository.deleteById(orderId);
     }
+
+
 }

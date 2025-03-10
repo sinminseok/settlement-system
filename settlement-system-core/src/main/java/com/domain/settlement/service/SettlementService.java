@@ -28,9 +28,9 @@ public class SettlementService {
     private final MonthlySettlementRepository monthlySettlementRepository;
 
 
-    public Settlement findByIdAndDate(final UUID shopId, final LocalDate localDate){
+    public Optional<Settlement> findByIdAndDate(final UUID shopId, final LocalDate localDate){
         Optional<Settlement> byShopIdAndSettlementDate = settlementRepository.findByShopIdAndSettlementDate(shopId, localDate);
-        return byShopIdAndSettlementDate.get();
+        return byShopIdAndSettlementDate;
     }
 
     public MonthlySettlement findByIdAndMonth(final UUID shopId, final LocalDate localDate) {

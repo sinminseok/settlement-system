@@ -1,7 +1,9 @@
 package com.domain.order.repository;
 
+import com.domain.order.constants.OrderStatus;
 import com.domain.order.entity.Order;
 import com.domain.order.entity.QOrder;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -55,6 +57,31 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
     }
 
     @Override
+    public List<Order> findByFilterAndPage(OrderStatus orderStatus, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        BooleanBuilder whereClause = new BooleanBuilder();
+
+        // OrderStatus가 null이 아닐 경우 해당 상태 필터링
+        if (orderStatus != null) {
+            whereClause.and(qOrder.status.eq(orderStatus));
+        }
+
+        // startDate와 endDate가 null이 아닐 경우 기간 필터링
+        if (startDate != null && endDate != null) {
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+            whereClause.and(qOrder.startDateTime.between(startDateTime, endDateTime));
+        }
+
+        return query.selectFrom(qOrder)
+                .where(whereClause)
+                .orderBy(qOrder.startDateTime.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
+
+
+    @Override
     public Integer findOrderCount(UUID shopId, LocalDate date) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(23, 59, 59);
@@ -74,6 +101,31 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
                 .from(qOrder)
                 .where(qOrder.shop.id.eq(shopId))
                 .fetchOne();
+        return (count != null) ? count.intValue() : 0;
+    }
+
+    @Override
+    public int countByPeriodAndStatus(OrderStatus orderStatus, LocalDate startDate, LocalDate endDate) {
+        BooleanBuilder whereClause = new BooleanBuilder();
+
+        // OrderStatus가 null이 아닐 경우 필터링
+        if (orderStatus != null) {
+            whereClause.and(qOrder.status.eq(orderStatus));
+        }
+
+        // startDate와 endDate가 null이 아닐 경우 기간 필터링
+        if (startDate != null && endDate != null) {
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+            whereClause.and(qOrder.startDateTime.between(startDateTime, endDateTime));
+        }
+
+        // 주문 개수 카운트
+        Long count = query.select(qOrder.count())
+                .from(qOrder)
+                .where(whereClause)
+                .fetchOne();
+
         return (count != null) ? count.intValue() : 0;
     }
 

@@ -1,5 +1,6 @@
 package com.domain.order.repository;
 
+import com.domain.order.constants.OrderStatus;
 import com.domain.order.entity.Order;
 
 import org.springframework.cglib.core.Local;
@@ -16,9 +17,13 @@ public interface CustomOrderRepository {
 
     List<Order> findRecentOrders(UUID shopId, LocalDate today);
 
+    List<Order> findByFilterAndPage(OrderStatus orderStatus, LocalDate startDate, LocalDate endDate, Pageable pageable);
+
     Integer findOrderCount(UUID shopId, LocalDate date);
 
     int countByShopId(UUID shopId);
+
+    int countByPeriodAndStatus(OrderStatus orderStatus, LocalDate startDate, LocalDate endDate);
 
     int countByPeriod(UUID shopId, LocalDate startDate, LocalDate endDate);
 }

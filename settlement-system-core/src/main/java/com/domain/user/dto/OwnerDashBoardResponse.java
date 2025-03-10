@@ -14,7 +14,7 @@ import java.util.UUID;
 public class OwnerDashBoardResponse {
     private UUID shopId;
     private List<OrderResponse> recentOrders;
-    private SettlementResponse todaySettlement;
+                private SettlementResponse todaySettlement;
     private Integer todayOrderCount;
     private List<Double> weeklySales;
 }

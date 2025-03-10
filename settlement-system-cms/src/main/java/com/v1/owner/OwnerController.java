@@ -1,25 +1,22 @@
 package com.v1.owner;
 
 import com.auth.SecurityContextHelper;
-import com.domain.order.dto.InitOrderResponse;
-import com.domain.order.dto.OrderResponse;
 import com.domain.order.service.OrderService;
 import com.domain.settlement.dto.SettlementResponse;
 import com.domain.settlement.entity.Settlement;
 import com.domain.settlement.service.SettlementService;
 import com.domain.shop.service.ShopService;
 import com.domain.user.dto.OwnerDashBoardResponse;
-import com.domain.user.service.UserService;
 import com.v1.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -50,10 +47,15 @@ public class OwnerController {
     }
 
     private OwnerDashBoardResponse getOwnerDashBoardResponse(UUID shopId) {
+        Optional<Settlement> byIdAndDate = settlementService.findByIdAndDate(shopId, LocalDate.now());
+        SettlementResponse settlementResponse = null;
+        if(byIdAndDate.isPresent()){
+             settlementResponse = SettlementResponse.from(byIdAndDate.get());
+        }
         return OwnerDashBoardResponse.builder()
                 .shopId(shopId)
                 .recentOrders(orderService.getRecentOrders(shopId))
-                .todaySettlement(SettlementResponse.from(settlementService.findByIdAndDate(shopId, LocalDate.now())))
+                .todaySettlement(settlementResponse)
                 .todayOrderCount(orderService.getTodayOrderCount(shopId))
                 .weeklySales(settlementService.getWeeklySales(shopId))
                 .build();
