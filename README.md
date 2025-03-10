@@ -69,6 +69,14 @@
     <h4><a href="https://comumu.tistory.com/123" target="_blank" style="color: #007bff; text-decoration: none;">Spring Batch 로 정산 시스템 만들어보기 (4)</a></h4>
   </div>
 
+  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; width: 250px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h4><a href="https://comumu.tistory.com/146" target="_blank" style="color: #007bff; text-decoration: none;">JobParameter 날짜 변환 Tip</a></h4>
+  </div>
+
+  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; width: 250px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h4><a href="https://comumu.tistory.com/157" target="_blank" style="color: #007bff; text-decoration: none;">Spring Batch, QueryDSL 적용기</a></h4>
+  </div>
+
 </details>
 
 
