@@ -13,9 +13,6 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Order 전처리 후 정보를 나타낼 Entity
- */
 @Entity
 @Getter
 @Builder

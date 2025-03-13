@@ -7,9 +7,6 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * 결제 정보를 나타내는 Entity
- */
 @Entity
 @Getter
 @Builder

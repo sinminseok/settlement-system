@@ -3,7 +3,6 @@ package com.domain.order.repository;
 import com.domain.order.constants.OrderStatus;
 import com.domain.order.entity.Order;
 
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;

@@ -14,6 +14,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.context.annotation.Bean;
@@ -56,7 +57,7 @@ public class DataCollectionJobConfig {
     @Bean
     @JobScope
     public Step dataCollectionStep() {
-        JpaPagingItemReader<Order> reader = DataCollectionComponents.dataCollectionReader(entityManagerFactory, jobParameter);
+        ItemReader<Order> reader = DataCollectionComponents.dataCollectionReader(entityManagerFactory, jobParameter);
         ItemProcessor<Order, OrderTransaction> processor = DataCollectionComponents.dataCollectionProcessor();
         JpaItemWriter<OrderTransaction> writer = DataCollectionComponents.dataCollectionWriter(entityManagerFactory);
         return new StepBuilder(STEP_NAME, jobRepository)

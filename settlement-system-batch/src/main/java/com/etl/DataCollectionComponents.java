@@ -3,30 +3,34 @@ package com.etl;
 import com.domain.order.entity.OrderTransaction;
 import com.domain.order.entity.Order;
 import com.domain.order.constants.OrderStatus;
+import com.domain.order.entity.QOrder;
 import com.parameters.DateParameter;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.reader.QuerydslPagingItemReader;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JpaItemWriter;
-import org.springframework.batch.item.database.JpaPagingItemReader;
-import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.function.Function;
 
 public class DataCollectionComponents {
 
-    public static JpaPagingItemReader<Order> dataCollectionReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
+    public static ItemReader<Order> dataCollectionReader(EntityManagerFactory entityManagerFactory, DateParameter dateParameter) {
         LocalDate requestDate = dateParameter.getRequestDate();
-        String query = "SELECT t FROM Order t WHERE FUNCTION('DATE', t.completionDateTime) = :requestDate";
+        QOrder qOrder = QOrder.order;
 
-        return new JpaPagingItemReaderBuilder<Order>()
-                .name("dataCollectionReader")
-                .entityManagerFactory(entityManagerFactory)
-                .pageSize(100)
-                .queryString(query)
-                .parameterValues(Map.of("requestDate", requestDate))
-                .build();
+        Function<JPAQueryFactory, JPAQuery<Order>> queryFunction = queryFactory ->
+                queryFactory.selectFrom(qOrder)
+                        .where(qOrder.completionDateTime.year().eq(requestDate.getYear())
+                                .and(qOrder.completionDateTime.month().eq(requestDate.getMonthValue()))
+                                .and(qOrder.completionDateTime.dayOfMonth().eq(requestDate.getDayOfMonth())));
+
+        return new QuerydslPagingItemReader<>(entityManagerFactory, 100, queryFunction);
     }
+
 
     public static ItemProcessor<Order, OrderTransaction> dataCollectionProcessor() {
         return transaction -> {

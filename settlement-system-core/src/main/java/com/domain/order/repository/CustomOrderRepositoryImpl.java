@@ -60,12 +60,10 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
     public List<Order> findByFilterAndPage(OrderStatus orderStatus, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         BooleanBuilder whereClause = new BooleanBuilder();
 
-        // OrderStatus가 null이 아닐 경우 해당 상태 필터링
         if (orderStatus != null) {
             whereClause.and(qOrder.status.eq(orderStatus));
         }
 
-        // startDate와 endDate가 null이 아닐 경우 기간 필터링
         if (startDate != null && endDate != null) {
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
@@ -108,19 +106,16 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
     public int countByPeriodAndStatus(OrderStatus orderStatus, LocalDate startDate, LocalDate endDate) {
         BooleanBuilder whereClause = new BooleanBuilder();
 
-        // OrderStatus가 null이 아닐 경우 필터링
         if (orderStatus != null) {
             whereClause.and(qOrder.status.eq(orderStatus));
         }
 
-        // startDate와 endDate가 null이 아닐 경우 기간 필터링
         if (startDate != null && endDate != null) {
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
             whereClause.and(qOrder.startDateTime.between(startDateTime, endDateTime));
         }
 
-        // 주문 개수 카운트
         Long count = query.select(qOrder.count())
                 .from(qOrder)
                 .where(whereClause)
@@ -131,11 +126,9 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
 
     @Override
     public int countByPeriod(UUID shopId, LocalDate startDate, LocalDate endDate) {
-        // 시작 날짜와 종료 날짜를 LocalDateTime으로 변환
         LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(23, 59, 59); // 하루의 마지막 시간까지 포함
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
-        // 기간에 해당하는 주문 개수 카운트
         Long count = query.select(qOrder.count())
                 .from(qOrder)
                 .where(qOrder.shop.id.eq(shopId)
@@ -144,7 +137,4 @@ public class CustomOrderRepositoryImpl implements CustomOrderRepository{
 
         return (count != null) ? count.intValue() : 0;
     }
-
-
-
 }
