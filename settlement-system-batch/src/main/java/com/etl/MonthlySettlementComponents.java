@@ -1,46 +1,45 @@
 package com.etl;
 
 import com.domain.settlement.entity.MonthlySettlement;
+import com.domain.settlement.entity.QSettlement;
 import com.domain.settlement.entity.Settlement;
 import com.dto.SettlementAggregation;
 import com.parameters.DateParameter;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.reader.QuerydslPagingItemReader;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.function.Function;
 
 public class MonthlySettlementComponents {
 
-    public static JpaPagingItemReader<SettlementAggregation> monthlySettlementReader(EntityManagerFactory entityManagerFactory, DateParameter jobParameter) {
-        String query = """
-        SELECT new com.dto.SettlementAggregation(
-            s.shopId, 
-            s.shopName, 
-            SUM(s.totalRefunds), 
-            SUM(s.totalSales), 
-            SUM(s.netSales), 
-            MAX(s.settlementDateTime)
-        )
-        FROM Settlement s
-        WHERE FUNCTION('YEAR', s.settlementDateTime) = :year
-        AND FUNCTION('MONTH', s.settlementDateTime) = :month
-        GROUP BY s.shopId, s.shopName
-        """;
+    public static ItemReader<SettlementAggregation> monthlySettlementReader(EntityManagerFactory entityManagerFactory, DateParameter jobParameter) {
+        QSettlement s = QSettlement.settlement;
 
-        return new JpaPagingItemReaderBuilder<SettlementAggregation>()
-                .name("monthlySettlementReader")
-                .entityManagerFactory(entityManagerFactory)
-                .pageSize(100)
-                .queryString(query)
-                .parameterValues(Map.of(
-                        "year", jobParameter.getRequestDate().getYear(),
-                        "month", jobParameter.getRequestDate().getMonthValue()
-                ))
-                .build();
+        Function<JPAQueryFactory, JPAQuery<SettlementAggregation>> queryFunction = queryFactory ->
+                queryFactory.select(Projections.constructor(SettlementAggregation.class,
+                                s.shopId,
+                                s.shopName,
+                                s.totalRefunds.sum(),
+                                s.totalSales.sum(),
+                                s.netSales.sum(),
+                                s.settlementDateTime.max()
+                        ))
+                        .from(s)
+                        .where(s.settlementDateTime.year().eq(jobParameter.getRequestDate().getYear())
+                                .and(s.settlementDateTime.month().eq(jobParameter.getRequestDate().getMonthValue())))
+                        .groupBy(s.shopId, s.shopName);
+
+        return new QuerydslPagingItemReader<>(entityManagerFactory, 100, queryFunction);
     }
 
 
